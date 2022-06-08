@@ -7,7 +7,7 @@ export const userAPI = createApi({
             query: (filters) => ({
                 url: '/users',
                 params: {
-                    filter
+                    filters
                 }
             })
         }),

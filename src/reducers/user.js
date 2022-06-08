@@ -29,3 +29,5 @@ const userSlice = createSlice({
 })
 
 export const { signIn, signInError, signInSuccess } = userSlice.actions
+
+export default userSlice.reducer
