@@ -1,4 +1,27 @@
 #root {
     min-height: 100vh;
-    background-color: red;
+}
+
+.page-layout {
+    display: flex;
+    height: 100%;
+    min-height: 100vh;
+}
+.sidebar {
+    width: 250px;
+}
+.content {
+    width: 100%;
+}
+
+.spin {
+    animation: spin 0.5s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0);
+    } to {
+        transform: rotate(360deg);
+    }
 }

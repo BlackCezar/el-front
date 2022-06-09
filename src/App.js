@@ -1,27 +1,74 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from "react-router-dom";
 import {
+    Alert,
+    AlertIcon,
     Box,
     Button,
     Center,
     Container,
     Flex,
     FormControl,
-    FormErrorMessage,
-    FormHelperText,
     FormLabel,
     Image,
     Input,
+    Spinner,
     Text
 } from '@chakra-ui/react'
+import { useDispatch } from 'react-redux';
 import './assets/scss/App.scss'
+import { useAuthUserMutation } from './store/services/UserService'
+import { saveUser } from './reducers/user';
 
 function App() {
-    const [input, setInput] = useState('')
+    const dispatch = useDispatch()
+    const history = useNavigate();
 
-    const handleInputChange = (e) => setInput(e.target.value)
+    const [loginInput, setLoginInput] = useState({
+        value: '',
+        touched: false,
+        valid: false
+    })
+    const [passwordInput, setPasswordInput] = useState({
+        value: '',
+        touched: false,
+        valid: false
+    })
+    const [login, {isLoading, data, isSuccess}] = useAuthUserMutation()
+    const handleLogin = val => {
+        val = val.target.value
+        setLoginInput({
+            touched: true,
+            value: val,
+            valid: val !== '' && val !== '' && String(val).length > 4
+        })
+    }
 
-    const isError = input === ''
+    const handlePassword = val => {
+        val = val.target.value
+        setPasswordInput({
+            touched: true,
+            value: val,
+            valid: val !== '' && val !== '' && String(val).length > 4
+        })
+    }
 
+    const handleSendForm = async ev => {
+        ev.preventDefault()
+      
+        await login({
+            login: loginInput.value,
+            password: passwordInput.value
+        })
+       
+    }
+
+    useEffect(() => {
+        if (isSuccess && data.code === 0) {
+            dispatch(saveUser(data.object))
+            history("/dashboard");
+        }
+    }, [data])
     return (
         <div className="login-page">
             <Center>
@@ -41,41 +88,38 @@ function App() {
                 <Box borderWidth="1px" p="15" borderRadius="10">
                     <form>
                         {' '}
-                        <FormControl isInvalid={isError} isRequired mb={5}>
-                            <FormLabel htmlFor="email">Email</FormLabel>
+                        <FormControl isInvalid={loginInput.touched && !loginInput.valid} isRequired mb={5}>
+                            <FormLabel htmlFor="login">Логин:</FormLabel>
                             <Input
-                                id="email"
-                                type="email"
-                                value={input}
-                                onChange={handleInputChange}
+                                id="login"
+                                type="text"
+                                value={loginInput.value}
+                                onChange={handleLogin}
                             />
-                            {!isError ? (
-                                <FormHelperText>Helper</FormHelperText>
-                            ) : (
-                                <FormErrorMessage>
-                                    Email is required.
-                                </FormErrorMessage>
-                            )}
                         </FormControl>
-                        <FormControl isInvalid={isError}>
-                            <FormLabel htmlFor="email">Email</FormLabel>
+                        <FormControl isInvalid={passwordInput.touched && !passwordInput.valid} isRequired mb={5}>
+                            <FormLabel htmlFor="email">Пароль:</FormLabel>
                             <Input
-                                id="email"
-                                type="email"
-                                value={input}
-                                onChange={handleInputChange}
+                                id="password"
+                                type="password"
+                                value={passwordInput.value}
+                                onChange={handlePassword}
                             />
-                            {!isError ? (
-                                <FormHelperText>newsletter on.</FormHelperText>
-                            ) : (
-                                <FormErrorMessage>
-                                    Email is required.
-                                </FormErrorMessage>
-                            )}
                         </FormControl>
-                        <Button mt={4} type="submit">
-                            Submit
-                        </Button>
+                            <Flex flexDir='column' w='100%' >
+                            <Center>
+
+                                <Button w='50%'  onClick={handleSendForm} mt={4} mb={4} type="submit">
+                                    {isLoading ? <Spinner /> : 'Войти'}
+                                </Button>
+                        </Center>
+
+                                {data && data.code !== 0 && <Alert status='error'>
+                                    <AlertIcon />
+                                    {data.message}
+                                </Alert>}
+                            </Flex>
+
                     </form>
                 </Box>
             </Container>

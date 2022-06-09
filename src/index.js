@@ -12,6 +12,7 @@ import UsersPage from './containers/UsersPage'
 import GroupsPage from './containers/GroupsPage'
 import ExportPage from './containers/ExportPage'
 import theme from './theme'
+import Layout from "./components/Layout";
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
@@ -21,12 +22,12 @@ root.render(
                 <BrowserRouter>
                     <Routes>
                         <Route path="/" element={<App />} />
-                        <Route path="dashboard" element={<DashboardPage />} />
-                        <Route path="journal" element={<JournalPage />} />
-                        <Route path="brs" element={<BRSPage />} />
-                        <Route path="groups" element={<GroupsPage />} />
-                        <Route path="users" element={<UsersPage />} />
-                        <Route path="export" element={<ExportPage />} />
+                        <Route path="dashboard" element={<Layout><DashboardPage /></Layout>} />
+                        <Route path="journal" element={<Layout><JournalPage /></Layout>} />
+                        <Route path="brs" element={<Layout><BRSPage /></Layout>} />
+                        <Route path="groups" element={<Layout><GroupsPage /></Layout>} />
+                        <Route path="users" element={<Layout><UsersPage /></Layout>} />
+                        <Route path="export" element={<Layout><ExportPage /></Layout>} />
                     </Routes>
                 </BrowserRouter>
             </ChakraProvider>
