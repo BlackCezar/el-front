@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { ChakraProvider } from '@chakra-ui/react'
+import { ChakraProvider, Heading } from '@chakra-ui/react'
 import { Provider } from 'react-redux'
 import App from './App'
 import { store } from './store'
@@ -10,9 +10,10 @@ import JournalPage from './containers/JournalPage'
 import BRSPage from './containers/BRSPage'
 import UsersPage from './containers/UsersPage'
 import GroupsPage from './containers/GroupsPage'
+import Logout from './containers/Logout'
 import ExportPage from './containers/ExportPage'
 import theme from './theme'
-import Layout from "./components/Layout";
+import Layout from './components/Layout'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
@@ -22,12 +23,70 @@ root.render(
                 <BrowserRouter>
                     <Routes>
                         <Route path="/" element={<App />} />
-                        <Route path="dashboard" element={<Layout><DashboardPage /></Layout>} />
-                        <Route path="journal" element={<Layout><JournalPage /></Layout>} />
-                        <Route path="brs" element={<Layout><BRSPage /></Layout>} />
-                        <Route path="groups" element={<Layout><GroupsPage /></Layout>} />
-                        <Route path="users" element={<Layout><UsersPage /></Layout>} />
-                        <Route path="export" element={<Layout><ExportPage /></Layout>} />
+                        <Route
+                            path="dashboard"
+                            element={
+                                <Layout>
+                                    <DashboardPage />
+                                </Layout>
+                            }
+                        />
+                        <Route
+                            path="journal"
+                            element={
+                                <Layout>
+                                    <JournalPage />
+                                </Layout>
+                            }
+                        />
+                        <Route
+                            path="brs"
+                            element={
+                                <Layout>
+                                    <BRSPage />
+                                </Layout>
+                            }
+                        />
+                        <Route
+                            path="groups"
+                            element={
+                                <Layout>
+                                    <GroupsPage />
+                                </Layout>
+                            }
+                        />
+                        <Route
+                            path="users"
+                            element={
+                                <Layout>
+                                    <UsersPage />
+                                </Layout>
+                            }
+                        />
+                        <Route
+                            path="export"
+                            element={
+                                <Layout>
+                                    <ExportPage />
+                                </Layout>
+                            }
+                        />
+                        <Route
+                            path="logout"
+                            element={
+                                <Layout>
+                                    <Logout />
+                                </Layout>
+                            }
+                        />
+                        <Route
+                            path="*"
+                            element={
+                                <Layout>
+                                    <Heading>Здесь ничего нет</Heading>
+                                </Layout>
+                            }
+                        />
                     </Routes>
                 </BrowserRouter>
             </ChakraProvider>

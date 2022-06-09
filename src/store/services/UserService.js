@@ -12,7 +12,22 @@ export const userAPI = createApi({
                 body: data
             })
         }),
+        checkConnection: build.query({
+            query: () => ({ url: '/check' })
+        }),
+        logoutUser: build.query({
+            query: () => ({ url: '/logout' })
+        }),
+        getUsers: build.query({
+            query: () => ({ url: '/' }),
+            providesTags: 'Users'
+        })
     })
 })
 
-export const {useAuthUserMutation} = userAPI
+export const {
+    useAuthUserMutation,
+    useLogoutUserQuery,
+    useCheckConnectionQuery,
+    useGetUsersQuery
+} = userAPI
