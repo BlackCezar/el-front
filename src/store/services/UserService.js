@@ -21,7 +21,25 @@ export const userAPI = createApi({
         getUsers: build.query({
             query: () => ({ url: '/' }),
             providesTags: 'Users'
-        })
+        }),
+        createUser: build.mutation({
+            query: (data) => ({
+                url: '/',
+                method: 'POST',
+                body: data
+            })
+        }),
+        updateUser: build.mutation({
+            query: (data) => ({
+                url: '/',
+                method: 'PUT',
+                body: data
+            })
+        }),
+        deleteUsers: build.query({
+            query: (id) => ({ url: `/${id}`, method: 'DELETE' }),
+            providesTags: 'Users'
+        }),
     })
 })
 
@@ -29,5 +47,8 @@ export const {
     useAuthUserMutation,
     useLogoutUserQuery,
     useCheckConnectionQuery,
-    useGetUsersQuery
+    useGetUsersQuery,
+    useCreateUserMutation,
+    useDeleteUsersQuery,
+    useUpdateUserMutation
 } = userAPI

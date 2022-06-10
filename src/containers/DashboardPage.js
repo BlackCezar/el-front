@@ -8,7 +8,7 @@ import DashboardParent from '../components/dashboard/DashboardParent'
 export default function DashboardPage() {
     const user = useSelector((state) => state.user.object)
 
-    if (user.role === 'Student') {
+    if (user.role === 'Admin') {
         return <DashboardStudent user={user} />
     }
     if (user.role === 'Teacher') {
