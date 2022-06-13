@@ -10,6 +10,7 @@ import JournalPage from './containers/JournalPage'
 import BRSPage from './containers/BRSPage'
 import UsersPage from './containers/UsersPage'
 import GroupsPage from './containers/GroupsPage'
+import GroupItemPage from './components/GroupItemPage'
 import Logout from './containers/Logout'
 import ExportPage from './containers/ExportPage'
 import theme from './theme'
@@ -52,6 +53,14 @@ root.render(
                             element={
                                 <Layout>
                                     <GroupsPage />
+                                </Layout>
+                            }
+                        />
+                        <Route
+                            path="groups/:groupId"
+                            element={
+                                <Layout>
+                                    <GroupItemPage />
                                 </Layout>
                             }
                         />

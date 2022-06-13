@@ -1,14 +1,9 @@
 import {
     Badge,
     Box,
-    Button, Center, FormControl, FormLabel, IconButton, Input,
-    Modal,
-    ModalBody,
-    ModalCloseButton,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    ModalOverlay, Select,
+    Button,
+    Center,
+    IconButton,
     Spinner,
     Table,
     TableContainer,
@@ -18,15 +13,20 @@ import {
     Thead,
     Tr,
     useDisclosure
-} from "@chakra-ui/react";
-import React, { useState } from "react";
-import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { useDeleteUsersQuery, useGetUsersQuery } from '../store/services/UserService'
+} from '@chakra-ui/react'
+import React, { useState } from 'react'
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import {
+    useLazyDeleteUsersQuery,
+    useGetUsersQuery
+} from '../store/services/UserService'
+import UserModal from '../components/users/UserModal'
 
 export default function UsersPage() {
-    const { data, isLoading } = useGetUsersQuery()
-    const users = data && data.array ? data.array : []
+    const { data: users, isLoading, refetch: usersRefetch } = useGetUsersQuery()
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const [deleteUser] = useLazyDeleteUsersQuery()
+    const [selectedUser, selectUser] = useState(null)
     const [userFrom, setUserForm] = useState({
         login: '',
         password: '',
@@ -37,7 +37,7 @@ export default function UsersPage() {
         role: 'Student',
         birthdate: '',
         group: null,
-        parent: null,
+        parent: null
     })
 
     const handleUserForm = (prop, val) => {
@@ -49,16 +49,6 @@ export default function UsersPage() {
         newVal[prop] = val
         setUserForm(newVal)
     }
-
-    const editModal = user => {
-        setUserForm({
-            login: user.login, 
-            fullname: user.fullname,
-            phone: user.phone,
-            address: user.address,
-        })
-    }
-
 
     return (
         <div>
@@ -82,29 +72,58 @@ export default function UsersPage() {
                             <Tbody>
                                 {users &&
                                     users.map((u) => (
-                                        <Tr>
+                                        <Tr key={u._id}>
                                             <Td>{u.fullname}</Td>
                                             <Td>{u.login}</Td>
                                             <Td>{u.phone}</Td>
                                             <Td>
-                                                {u.role === 'Admin' &&
-                                                  <Badge>Администратор</Badge>}
-                                                {u.role === 'Student' &&
-                                                    'Ученик'}
-                                                {u.role === 'Teacher' &&
-                                                    'Учитель'}
+                                                {u.role === 'Admin' && (
+                                                    <Badge>Администратор</Badge>
+                                                )}
+                                                {u.role === 'Student' && (
+                                                    <Badge>Ученик</Badge>
+                                                )}
+                                                {u.role === 'Teacher' && (
+                                                    <Badge>Учитель</Badge>
+                                                )}
                                                 {u.role ===
-                                                    'ClassRoomTeacher' &&
-                                                    'Классный рук.'}
-                                                {u.role === 'Deputy' && 'Зам.'}
-                                                {u.role === 'Parent' &&
-                                                    'Родитель'}
+                                                    'ClassRoomTeacher' && (
+                                                    <Badge>Классный рук.</Badge>
+                                                )}
+                                                {u.role === 'Deputy' && (
+                                                    <Badge>Зам.</Badge>
+                                                )}
+                                                {u.role === 'Parent' && (
+                                                    <Badge>Родитель</Badge>
+                                                )}
                                             </Td>
-                                            <Td>{u.group}</Td>
-                                            <Td>{u.parent}</Td>
+                                            <Td>{u.group && u.group.name}</Td>
                                             <Td>
-                                                <IconButton onClick={() => editModal(u)} mr='2' colorScheme='yellow' icon={<EditIcon />} aria-label='Edit'/>
-                                                <IconButton onClick={() => useDeleteUsersQuery(u._id)} colorScheme='red' icon={<DeleteIcon />} aria-label='Delete'/>
+                                                {u.parent && u.parent.fullname}
+                                            </Td>
+                                            <Td>
+                                                <IconButton
+                                                    onClick={() => {
+                                                        selectUser(u)
+                                                        setUserForm({
+                                                            ...u
+                                                        })
+                                                        onOpen()
+                                                    }}
+                                                    mr="2"
+                                                    colorScheme="yellow"
+                                                    icon={<EditIcon />}
+                                                    aria-label="Edit"
+                                                />
+                                                <IconButton
+                                                    onClick={async () => {
+                                                        await deleteUser(u._id)
+                                                        usersRefetch()
+                                                    }}
+                                                    colorScheme="red"
+                                                    icon={<DeleteIcon />}
+                                                    aria-label="Delete"
+                                                />
                                             </Td>
                                         </Tr>
                                     ))}
@@ -113,80 +132,25 @@ export default function UsersPage() {
                     </TableContainer>
                 )}
 
-                    <Center m='2'><Button onClick={onOpen} colorScheme='telegram'>Добавить пользователя</Button></Center>
+                <Center m="2">
+                    <Button
+                        onClick={() => {
+                            selectUser(null)
+                            onOpen()
+                        }}
+                        colorScheme="telegram"
+                    >
+                        Добавить пользователя
+                    </Button>
+                </Center>
 
-                    <Modal isOpen={isOpen} onClose={onClose}>
-                        <ModalOverlay />
-                        <ModalContent>
-                            <ModalHeader>Добавление пользователя</ModalHeader>
-                            <ModalCloseButton />
-                            <ModalBody>
-                                <form>
-                                    <FormControl isRequired mb={2}>
-                                        <FormLabel htmlFor='fullname'>ФИО</FormLabel>
-                                        <Input id='fullname' value={userFrom.fullname} onChange={val => handleUserForm('fullname', val)} placeholder='Иванов Иван' />
-                                    </FormControl>
-                                    <FormControl isRequired mb={2}>
-                                        <FormLabel htmlFor='login'>Логин</FormLabel>
-                                        <Input id='login' value={userFrom.login} onChange={val => handleUserForm('login', val)} />
-                                    </FormControl>
-                                    <FormControl isRequired mb={2}>
-                                        <FormLabel htmlFor='password'>Пароль</FormLabel>
-                                        <Input id='password' type='password' value={userFrom.password} onChange={val => handleUserForm('password', val)}/>
-                                    </FormControl>
-                                    <FormControl isRequired mb={2}>
-                                        <FormLabel htmlFor='rep_pass'>Повторите пароль</FormLabel>
-                                        <Input id='rep_pass' type='password' value={userFrom.rePassowrd} onChange={val => handleUserForm('rePassword', val)}/>
-                                    </FormControl>
-                                    <FormControl isRequired mb={2}>
-                                        <FormLabel htmlFor='role'>Роль</FormLabel>
-                                        <Select id='role' placeholder='Выберите роль' value={userFrom.role} onChange={val => handleUserForm('role', val)}>
-                                            <option value="Student">Ученик</option>
-                                            <option value="Parent">Родитель</option>
-                                            <option value="Teacher">Учитель</option>
-                                            <option value="Student">Администратор</option>
-                                            <option value="Deputy">Зам.</option>
-                                            <option value="ClassRoomTeacher">Классный руководитель</option>
-                                        </Select>
-                                    </FormControl>
-                                    <FormControl mb={2}>
-                                        <FormLabel htmlFor='parent'>Родитель</FormLabel>
-                                        <Select id='parent' placeholder='Выберите родителя' value={userFrom.parent} onChange={val => handleUserForm('parent', val)}>
-                                            <option>United Arab Emirates</option>
-                                            <option>Nigeria</option>
-                                        </Select>
-                                    </FormControl>
-                                    <FormControl mb={2}>
-                                        <FormLabel htmlFor='group'>Группа</FormLabel>
-                                        <Select id='group' placeholder='Выберите группу' value={userFrom.group} onChange={val => handleUserForm('group', val)}>
-                                            <option>United Arab Emirates</option>
-                                            <option>Nigeria</option>
-                                        </Select>
-                                    </FormControl>
-                                    <FormControl mb={2}>
-                                        <FormLabel htmlFor='phone'>Номер телефона</FormLabel>
-                                        <Input id='phone' placeholder='+7 999 999 9999' value={userFrom.phone} onChange={val => handleUserForm('phone', val)} />
-                                    </FormControl>
-                                    <FormControl mb={2}>
-                                        <FormLabel htmlFor='address'>Адрес</FormLabel>
-                                        <Input id='address' placeholder='ул. Ленина, д. 5, кв. 22' value={userFrom.address} onChange={val => handleUserForm('address', val)} />
-                                    </FormControl>
-                                </form>
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button
-                                    colorScheme="blue"
-                                    mr={3}
-                                    onClick={onClose}
-                                >
-                                    Закрыть
-                                </Button>
-                                <Button colorScheme='green'>
-                                    Добавить
-                                </Button>
-                            </ModalFooter>
-                        </ModalContent>
-                    </Modal>
+                <UserModal
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    user={selectedUser}
+                    handler={handleUserForm}
+                    data={userFrom}
+                />
             </Box>
         </div>
     )

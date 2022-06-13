@@ -6,8 +6,13 @@ export const groupsAPI = createApi({
     tagTypes: ['Groups'],
     endpoints: (build) => ({
         getGroups: build.query({
-            query: () => ({ url: '/' }),
-            providesTags: 'Groups'
+            query: (params) => ({ url: '/', params }),
+            providesTags: 'Groups',
+            transformResponse: (response) => response.array
+        }),
+        getGroup: build.query({
+            query: (id) => ({ url: `/${id}` }),
+            transformResponse: (response) => response.object
         }),
         createGroup: build.mutation({
             query: (data) => ({
@@ -17,7 +22,7 @@ export const groupsAPI = createApi({
             })
         }),
         updateGroup: build.mutation({
-            query: (data, id) => ({
+            query: ({ data, id }) => ({
                 url: `/${id}`,
                 method: 'PUT',
                 body: data
@@ -26,13 +31,15 @@ export const groupsAPI = createApi({
         deleteGroup: build.query({
             query: (id) => ({ url: `/${id}`, method: 'DELETE' }),
             providesTags: 'Users'
-        }),
+        })
     })
 })
 
 export const {
     useCreateGroupMutation,
     useGetGroupsQuery,
+    useGetGroupQuery,
     useDeleteGroupQuery,
+    useLazyDeleteGroupQuery,
     useUpdateGroupMutation
 } = groupsAPI
