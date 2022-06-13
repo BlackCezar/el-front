@@ -29,3 +29,42 @@
 .dayOfWeek:hover {
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.158), 0 1px 2px 0 rgba(8, 59, 87, 0.582);;
 }
+
+.journal-scroll {
+    overflow-x: scroll;
+    max-width: calc(100vw - 200px - 250px - 0px);
+
+    .journal-date {
+        writing-mode: tb;
+        transform: rotate(180deg);
+        padding: 5px;
+        height: 110px;
+        width: 36px;
+    }
+    .point {
+        width: 36px;
+        text-align: center;
+        padding: 5px;
+        cursor: pointer;
+        border: 1px solid rgba(128, 128, 128, 0.29);
+        box-sizing: border-box;
+    }
+    .point:hover {
+        background-color: rgba(210, 243, 255, 0.26);
+    }
+}
+
+.link-group {
+    cursor: pointer;
+
+    a {
+        width: 100%;
+        padding: 10px 15px;
+        display: block;
+        text-align: center;
+        border-radius: 10px;
+    }
+    a:hover {
+        background-color: rgba(210, 243, 255, 0.26);
+    }
+}
