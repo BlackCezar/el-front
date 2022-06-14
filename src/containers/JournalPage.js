@@ -1,5 +1,18 @@
-import React, {useMemo} from 'react'
-import {Box, Divider, Flex, List, ListItem, Text, OrderedList, StackItem, HStack, Heading} from "@chakra-ui/react";
+import React, { useMemo } from 'react'
+import {
+    Box,
+    Divider,
+    Flex,
+    List,
+    ListItem,
+    Text,
+    OrderedList,
+    StackItem,
+    HStack,
+    Heading
+} from '@chakra-ui/react'
+import { Navigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 export default function BRSPage() {
     const days = useMemo(() => {
@@ -8,68 +21,110 @@ export default function BRSPage() {
         for (let i = 0; i < 272; i += 1) {
             const tmpDate = new Date(firstDate)
             tmpDate.setDate(firstDate.getDate() + i)
-            if (tmpDate.getDay() !== 0) daysList.push(tmpDate.toLocaleDateString('ru-RU'))
+            if (tmpDate.getDay() !== 0)
+                daysList.push(tmpDate.toLocaleDateString('ru-RU'))
         }
         console.log(daysList)
         return daysList
     }, [])
-    return <div>
-        <Box borderWidth='1px' borderColor='blue'>
-            <Flex>
-                <Box w='200px' borderRight='1px solid blue' boxShadow='md'>
-                    <Flex alignItems='center' h='110px' justifyContent='center'>
-                        <Text p='5px' >Предмет / дата</Text>
-                    </Flex>
-                    <Divider />
-                    <OrderedList ml='8'>
-                        <ListItem p='6px'>
-                           <Text>Информатика</Text>
-                        </ListItem>
-                        <ListItem p='6px'>
-                            <Text>Информатика</Text>
-                        </ListItem>
-                        <ListItem p='6px'>
-                            <Text>Информатика</Text>
-                        </ListItem>
-                        <ListItem p='6px'>
-                            <Text>Информатика</Text>
-                        </ListItem>
-                    </OrderedList>
-                </Box>
-                <Box w='100%' className='journal-scroll'>
-                    {days &&
-                    (<HStack spacing={0}>
-                        {days.map((day) => {
-                            return (<StackItem key={day}>
-                                <Text borderColor='blue' borderWidth='1px' className='journal-date'>{day}</Text>
-                                <List>
-                                    <ListItem>
-                                        <Text className='point'>5</Text>
-                                        <Text className='point'>5</Text>
-                                        <Text className='point'>5</Text>
-                                        <Text className='point'>5</Text>
-                                        <Text className='point'>5</Text>
-                                        <Text className='point'>5</Text>
-                                    </ListItem>
-                                </List>
-                            </StackItem>)
-                        })}
-                    </HStack>)}
-                </Box>
-            </Flex>
-        </Box>
 
-        <Box boxShadow='md' mt={20} p={4}>
-            <Flex justifyContent='space-between'>
-                <Box w='100%' mr='5' borderRight='1px solid blue'>
-                    <Heading mb='5' textAlign='center'>Тема урока</Heading>
-                    <Text>Lorem</Text>
+    const user = useSelector((state) => state.user.object)
+
+    if (['Student', 'Teacher', 'ClassRoomTeacher'].includes(user.role)) {
+        return (
+            <div>
+                <Box borderWidth="1px" borderColor="blue">
+                    <Flex>
+                        <Box
+                            w="200px"
+                            borderRight="1px solid blue"
+                            boxShadow="md"
+                        >
+                            <Flex
+                                alignItems="center"
+                                h="110px"
+                                justifyContent="center"
+                            >
+                                <Text p="5px">Предмет / дата</Text>
+                            </Flex>
+                            <Divider />
+                            <OrderedList ml="8">
+                                <ListItem p="6px">
+                                    <Text>Информатика</Text>
+                                </ListItem>
+                                <ListItem p="6px">
+                                    <Text>Информатика</Text>
+                                </ListItem>
+                                <ListItem p="6px">
+                                    <Text>Информатика</Text>
+                                </ListItem>
+                                <ListItem p="6px">
+                                    <Text>Информатика</Text>
+                                </ListItem>
+                            </OrderedList>
+                        </Box>
+                        <Box w="100%" className="journal-scroll">
+                            {days && (
+                                <HStack spacing={0}>
+                                    {days.map((day) => {
+                                        return (
+                                            <StackItem key={day}>
+                                                <Text
+                                                    borderColor="blue"
+                                                    borderWidth="1px"
+                                                    className="journal-date"
+                                                >
+                                                    {day}
+                                                </Text>
+                                                <List>
+                                                    <ListItem>
+                                                        <Text className="point">
+                                                            5
+                                                        </Text>
+                                                        <Text className="point">
+                                                            5
+                                                        </Text>
+                                                        <Text className="point">
+                                                            5
+                                                        </Text>
+                                                        <Text className="point">
+                                                            5
+                                                        </Text>
+                                                        <Text className="point">
+                                                            5
+                                                        </Text>
+                                                        <Text className="point">
+                                                            5
+                                                        </Text>
+                                                    </ListItem>
+                                                </List>
+                                            </StackItem>
+                                        )
+                                    })}
+                                </HStack>
+                            )}
+                        </Box>
+                    </Flex>
                 </Box>
-                <Box w='100%'>
-                    <Heading mb='5' textAlign='center'>Домашнее задание</Heading>
-                    <Text>Lorem</Text>
+
+                <Box boxShadow="md" mt={20} p={4}>
+                    <Flex justifyContent="space-between">
+                        <Box w="100%" mr="5" borderRight="1px solid blue">
+                            <Heading mb="5" textAlign="center">
+                                Тема урока
+                            </Heading>
+                            <Text>Lorem</Text>
+                        </Box>
+                        <Box w="100%">
+                            <Heading mb="5" textAlign="center">
+                                Домашнее задание
+                            </Heading>
+                            <Text>Lorem</Text>
+                        </Box>
+                    </Flex>
                 </Box>
-            </Flex>
-        </Box>
-    </div>
+            </div>
+        )
+    }
+    return <Navigate to="404" />
 }

@@ -3,20 +3,10 @@ import {
     Box,
     Button,
     Flex,
-    FormControl,
-    FormLabel,
     Heading,
     IconButton,
-    Input,
     Link,
     ListItem,
-    Modal,
-    ModalBody,
-    ModalCloseButton,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    ModalOverlay,
     OrderedList,
     Spinner,
     Text,
@@ -26,6 +16,7 @@ import React from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router-dom'
 import { useGetGroupQuery } from '../store/services/GroupsService'
 import SetTeacherModal from './groups/SetTeacherModal'
+import AddStudentModal from './groups/AddStudentModal'
 
 export default function GroupItemPage() {
     const params = useParams()
@@ -80,24 +71,27 @@ export default function GroupItemPage() {
                 </Flex>
             </Box>
 
-            <Box mt={3} mb={3}>
-                <Flex alignItems="center">
-                    <Text mr={3}>Список учеников</Text>{' '}
-                </Flex>
+            <Box
+                mt={3}
+                mb={3}
+                borderWidth="1px"
+                borderRadius="10"
+                boxShadow="sm"
+            >
+                <OrderedList>
+                    {group.students &&
+                        group.students.length &&
+                        group.students.map((user) => (
+                            <ListItem p={2} ml={5} key={user._id}>
+                                <Link href={`/users/${user._id}`}>
+                                    <NavLink to={`/users/${user._id}`}>
+                                        {user.fullname}
+                                    </NavLink>
+                                </Link>
+                            </ListItem>
+                        ))}
+                </OrderedList>
             </Box>
-            <OrderedList>
-                {group.students &&
-                    group.students.length &&
-                    group.students.map((user) => (
-                        <ListItem key={user._id}>
-                            <Link href={`/users/${user._id}`}>
-                                <NavLink to={`/users/${user._id}`}>
-                                    {user.fullname}
-                                </NavLink>
-                            </Link>
-                        </ListItem>
-                    ))}
-            </OrderedList>
 
             <SetTeacherModal
                 group={group}
@@ -105,39 +99,10 @@ export default function GroupItemPage() {
                 onClose={teacherCloseModal}
             />
             <AddStudentModal
+                group={group}
                 isOpen={isStudentOpen}
                 onClose={studentCloseModal}
             />
         </div>
-    )
-}
-
-function AddStudentModal({ isOpen, onClose }) {
-    return (
-        <Modal isOpen={isOpen} onClose={onClose}>
-            <ModalOverlay />
-            <ModalContent>
-                <ModalHeader>Create your account</ModalHeader>
-                <ModalCloseButton />
-                <ModalBody pb={6}>
-                    <FormControl>
-                        <FormLabel>First name</FormLabel>
-                        <Input placeholder="First name" />
-                    </FormControl>
-
-                    <FormControl mt={4}>
-                        <FormLabel>Last name</FormLabel>
-                        <Input placeholder="Last name" />
-                    </FormControl>
-                </ModalBody>
-
-                <ModalFooter>
-                    <Button colorScheme="blue" mr={3}>
-                        Save
-                    </Button>
-                    <Button onClick={onClose}>Cancel</Button>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
     )
 }

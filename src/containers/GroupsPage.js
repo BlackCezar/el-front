@@ -20,12 +20,14 @@ import {
     useDisclosure,
     useToast
 } from '@chakra-ui/react'
-import { NavLink } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { Navigate, NavLink } from 'react-router-dom'
 import { ArrowForwardIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
     useCreateGroupMutation,
     useGetGroupsQuery,
-    useLazyDeleteGroupQuery
+    useLazyDeleteGroupQuery,
+    useUpdateGroupMutation
 } from '../store/services/GroupsService'
 import GroupsContent from '../components/groupsModalContent'
 
@@ -36,6 +38,7 @@ export default function GroupsPage() {
         isLoading: isGroupLoading
     } = useGetGroupsQuery()
     const [createGroup, createGroupData] = useCreateGroupMutation()
+    const [updateGroup] = useUpdateGroupMutation()
     const toast = useToast()
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [removeGroup] = useLazyDeleteGroupQuery()
@@ -57,6 +60,18 @@ export default function GroupsPage() {
             groupsRefetch()
         }
     }, [createGroupData.error, createGroupData.isSuccess])
+
+    const moveGroup = async (group) => {
+        const numberOfName = group.name.match(/\d+/g)
+        const newName = group.name.replace(/\d+/g, Number(numberOfName) + 1)
+        await updateGroup({
+            data: {
+                name: newName
+            },
+            id: group._id
+        })
+        groupsRefetch()
+    }
 
     const renderGroups = useCallback(
         (groupsList) => {
@@ -86,7 +101,13 @@ export default function GroupsPage() {
                                 mr={2}
                             />
                         </NavLink>
-                        <Button ml={2} colorScheme="facebook" variant="ghost">
+                        <Button
+                            ml={2}
+                            colorScheme="facebook"
+                            onClick={() => moveGroup(group)}
+                            variant="ghost"
+                            disabled={Number(group.name.match(/\d+/g)) >= 11}
+                        >
                             Перевести на след. класс
                         </Button>
                     </Td>
@@ -96,46 +117,51 @@ export default function GroupsPage() {
         [groups]
     )
 
-    return (
-        <div>
-            <Flex justifyContent="space-between">
-                <Heading mb={2}>Список классов</Heading>
-                <Button ml={2} colorScheme="green" onClick={onOpen}>
-                    Добавить класс
-                </Button>
-            </Flex>
-            {isGroupLoading && (
-                <Center>
-                    <Spinner />
-                </Center>
-            )}
+    const user = useSelector((state) => state.user.object)
 
-            <TableContainer>
-                <Table variant="simple" colorScheme="telegram">
-                    <Thead>
-                        <Tr>
-                            <Th>Номер класса</Th>
-                            <Th>Действия</Th>
-                        </Tr>
-                    </Thead>
-                    <Tbody>
-                        {groups && groups.length ? (
-                            renderGroups(groups)
-                        ) : (
+    if (['Deputy'].includes(user.role)) {
+        return (
+            <div>
+                <Flex justifyContent="space-between">
+                    <Heading mb={2}>Список классов</Heading>
+                    <Button ml={2} colorScheme="green" onClick={onOpen}>
+                        Добавить класс
+                    </Button>
+                </Flex>
+                {isGroupLoading && (
+                    <Center>
+                        <Spinner />
+                    </Center>
+                )}
+
+                <TableContainer>
+                    <Table variant="simple" colorScheme="telegram">
+                        <Thead>
                             <Tr>
-                                <Td>
-                                    <Text>Нет классов</Text>
-                                </Td>
-                                <Td />
+                                <Th>Номер класса</Th>
+                                <Th>Действия</Th>
                             </Tr>
-                        )}
-                    </Tbody>
-                </Table>
-            </TableContainer>
-            <Modal isOpen={isOpen} onClose={onClose}>
-                <ModalOverlay />
-                <GroupsContent onSubmit={createGroup} onClose={onClose} />
-            </Modal>
-        </div>
-    )
+                        </Thead>
+                        <Tbody>
+                            {groups && groups.length ? (
+                                renderGroups(groups)
+                            ) : (
+                                <Tr>
+                                    <Td>
+                                        <Text>Нет классов</Text>
+                                    </Td>
+                                    <Td />
+                                </Tr>
+                            )}
+                        </Tbody>
+                    </Table>
+                </TableContainer>
+                <Modal isOpen={isOpen} onClose={onClose}>
+                    <ModalOverlay />
+                    <GroupsContent onSubmit={createGroup} onClose={onClose} />
+                </Modal>
+            </div>
+        )
+    }
+    return <Navigate to="404" />
 }

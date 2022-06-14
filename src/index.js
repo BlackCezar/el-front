@@ -13,7 +13,9 @@ import GroupsPage from './containers/GroupsPage'
 import GroupItemPage from './components/GroupItemPage'
 import Logout from './containers/Logout'
 import ExportPage from './containers/ExportPage'
+import TeachersPage from './containers/TeachersPage'
 import theme from './theme'
+import UserDetailPage from './components/users/UserDetailPage'
 import Layout from './components/Layout'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
@@ -69,6 +71,22 @@ root.render(
                             element={
                                 <Layout>
                                     <UsersPage />
+                                </Layout>
+                            }
+                        />
+                        <Route
+                            path="teachers"
+                            element={
+                                <Layout>
+                                    <TeachersPage />
+                                </Layout>
+                            }
+                        />
+                        <Route
+                            path="users/:userId"
+                            element={
+                                <Layout>
+                                    <UserDetailPage />
                                 </Layout>
                             }
                         />

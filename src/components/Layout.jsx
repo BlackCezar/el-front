@@ -61,42 +61,107 @@ export default function Layout({ children }) {
     }
     return (
         <div className="page-layout">
-            <Box boxShadow="xl" className="sidebar" bg="rgb(249 249 249)" p="5">
-                <Heading color="blue" textAlign="center" mb={5}>
-                    СУНЦ СВФУ
-                </Heading>
-                <Divider mb="3" />
-                <Link to="/dashboard">
-                    <Button w="100%" colorScheme="telegram" variant="ghost">
-                        Расписание
-                    </Button>
-                </Link>
-                <Link to="/journal">
-                    <Button w="100%" colorScheme="telegram" variant="ghost">
-                        Журнал
-                    </Button>
-                </Link>
-                <Link to="/brs">
-                    <Button w="100%" colorScheme="telegram" variant="ghost">
-                        БРС
-                    </Button>
-                </Link>
-                <Link to="/groups">
-                    <Button w="100%" colorScheme="telegram" variant="ghost">
-                        Классы
-                    </Button>
-                </Link>
-                <Link to="/users">
-                    <Button w="100%" colorScheme="telegram" variant="ghost">
-                        Учетные записи
-                    </Button>
-                </Link>
-                <Link to="/export">
-                    <Button w="100%" colorScheme="telegram" variant="ghost">
-                        Экспорт
-                    </Button>
-                </Link>
-            </Box>
+            {isLoading || !user ? (
+                <Box
+                    boxShadow="xl"
+                    className="sidebar"
+                    bg="rgb(249 249 249)"
+                    p="5"
+                />
+            ) : (
+                <Box
+                    boxShadow="xl"
+                    className="sidebar"
+                    bg="rgb(249 249 249)"
+                    p="5"
+                >
+                    <Heading color="blue" textAlign="center" mb={5}>
+                        СУНЦ СВФУ
+                    </Heading>
+                    <Divider mb="3" />
+                    {['Student', 'Teacher', 'Parent', 'Deputy'].includes(
+                        user.role
+                    ) && (
+                        <Link to="/dashboard">
+                            <Button
+                                w="100%"
+                                colorScheme="telegram"
+                                variant="ghost"
+                            >
+                                Расписание
+                            </Button>
+                        </Link>
+                    )}
+                    {['Student', 'Teacher', 'ClassRoomTeacher'].includes(
+                        user.role
+                    ) && (
+                        <Link to="/journal">
+                            <Button
+                                w="100%"
+                                colorScheme="telegram"
+                                variant="ghost"
+                            >
+                                Журнал
+                            </Button>
+                        </Link>
+                    )}
+                    {['Student', 'ClassRoomTeacher'].includes(user.role) && (
+                        <Link to="/brs">
+                            <Button
+                                w="100%"
+                                colorScheme="telegram"
+                                variant="ghost"
+                            >
+                                БРС
+                            </Button>
+                        </Link>
+                    )}
+                    {['Deputy'].includes(user.role) && (
+                        <Link to="/groups">
+                            <Button
+                                w="100%"
+                                colorScheme="telegram"
+                                variant="ghost"
+                            >
+                                Классы
+                            </Button>
+                        </Link>
+                    )}
+                    {['Deputy'].includes(user.role) && (
+                        <Link to="/teachers">
+                            <Button
+                                w="100%"
+                                colorScheme="telegram"
+                                variant="ghost"
+                            >
+                                Учителя
+                            </Button>
+                        </Link>
+                    )}
+                    {['Admin'].includes(user.role) && (
+                        <Link to="/users">
+                            <Button
+                                w="100%"
+                                colorScheme="telegram"
+                                variant="ghost"
+                            >
+                                Учетные записи
+                            </Button>
+                        </Link>
+                    )}
+                    {['ClassRoomTeacher'].includes(user.role) && (
+                        <Link to="/export">
+                            <Button
+                                w="100%"
+                                colorScheme="telegram"
+                                variant="ghost"
+                            >
+                                Экспорт
+                            </Button>
+                        </Link>
+                    )}
+                </Box>
+            )}
             {isLoading || !user ? (
                 <Center w="100%">
                     <Spinner size="xl" />

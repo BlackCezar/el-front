@@ -31,6 +31,10 @@ export const userAPI = createApi({
             }),
             invalidatesTags: ['Users']
         }),
+        getUser: build.query({
+            query: (id) => ({ url: `/${id}` }),
+            transformResponse: (response) => response.object
+        }),
         updateUser: build.mutation({
             query: ({ data, id }) => ({
                 url: `/${id}`,
@@ -54,5 +58,6 @@ export const {
     useCreateUserMutation,
     useDeleteUsersQuery,
     useLazyDeleteUsersQuery,
-    useUpdateUserMutation
+    useUpdateUserMutation,
+    useGetUserQuery
 } = userAPI

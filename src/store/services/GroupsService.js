@@ -7,11 +7,12 @@ export const groupsAPI = createApi({
     endpoints: (build) => ({
         getGroups: build.query({
             query: (params) => ({ url: '/', params }),
-            providesTags: 'Groups',
+            providesTags: ['Groups'],
             transformResponse: (response) => response.array
         }),
         getGroup: build.query({
             query: (id) => ({ url: `/${id}` }),
+            providesTags: ['Groups'],
             transformResponse: (response) => response.object
         }),
         createGroup: build.mutation({
@@ -19,18 +20,20 @@ export const groupsAPI = createApi({
                 url: '/',
                 method: 'POST',
                 body: data
-            })
+            }),
+            invalidatesTags: ['Groups']
         }),
         updateGroup: build.mutation({
             query: ({ data, id }) => ({
                 url: `/${id}`,
                 method: 'PUT',
                 body: data
-            })
+            }),
+            invalidatesTags: ['Groups']
         }),
         deleteGroup: build.query({
             query: (id) => ({ url: `/${id}`, method: 'DELETE' }),
-            providesTags: 'Users'
+            invalidatesTags: ['Groups']
         })
     })
 })
