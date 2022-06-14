@@ -19,7 +19,7 @@ export default function DashboardPage() {
         if (user.role === 'Parent') {
             return <DashboardParent user={user} />
         }
-        if (user.role === 'Parent') {
+        if (user.role === 'Deputy') {
             return <DashboardDeputy user={user} />
         }
     }

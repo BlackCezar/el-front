@@ -20,7 +20,7 @@ export default function AddStudentModal({ isOpen, onClose, group }) {
     const { data: students } = useGetUsersQuery({
         role: 'Student'
     })
-    const [tch, setTch] = useState()
+    const [tch, setTch] = useState('')
     const toast = useToast()
 
     const [updateGroup, { isSuccess, isError, isUninitialized, error }] =
@@ -55,9 +55,8 @@ export default function AddStudentModal({ isOpen, onClose, group }) {
                     <FormControl>
                         <FormLabel>Выберите из списка</FormLabel>
                         <Select
-                            value={setTch}
+                            value={tch}
                             onChange={(ev) => {
-                                console.log(ev)
                                 setTch(ev.target.value)
                             }}
                         >

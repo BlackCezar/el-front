@@ -19,7 +19,9 @@ export const userAPI = createApi({
             query: () => ({ url: '/logout' })
         }),
         getUsers: build.query({
-            query: (params) => ({ url: '/', params }),
+            query: (params) => {
+                console.log(params)
+                return { url: '/', params: params }},
             providesTags: ['Users'],
             transformResponse: (response) => response.array
         }),
@@ -55,6 +57,7 @@ export const {
     useLogoutUserQuery,
     useCheckConnectionQuery,
     useGetUsersQuery,
+    useLazyGetUsersQuery,
     useCreateUserMutation,
     useDeleteUsersQuery,
     useLazyDeleteUsersQuery,

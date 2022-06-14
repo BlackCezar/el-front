@@ -20,7 +20,7 @@ export default function SetTeacherModal({ isOpen, onClose, group }) {
     const { data: teachers } = useGetUsersQuery({
         role: 'ClassRoomTeacher'
     })
-    const [tch, setTch] = useState()
+    const [tch, setTch] = useState(group.boss ? group.boss._id : '')
     const toast = useToast()
 
     const [updateGroup, { isSuccess, isError, isUninitialized, error }] =
@@ -55,7 +55,7 @@ export default function SetTeacherModal({ isOpen, onClose, group }) {
                     <FormControl>
                         <FormLabel>Выберите из списка</FormLabel>
                         <Select
-                            value={setTch}
+                            value={tch}
                             onChange={(ev) => setTch(ev.target.value)}
                         >
                             {teachers &&

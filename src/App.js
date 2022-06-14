@@ -66,7 +66,13 @@ function App() {
     useEffect(() => {
         if (isSuccess && data.code === 0) {
             dispatch(saveUser(data.object))
-            history("/dashboard");
+            const {role} = data.object
+            if (role === 'Deputy') history("/groups");
+            if (role === 'Admin') history("/users");
+            if (role === 'Student') history("/dashboard");
+            if (role === 'Teacher') history("/dashboard");
+            if (role === 'Parent') history("/dashboard");
+            if (role === 'ClassRoomTeacher') history("/journal");
         }
     }, [data])
     return (
