@@ -8,6 +8,8 @@
                 "extensions": [".js", ".jsx"]
             }
         ],
+        "import/no-extraneous-dependencies": ["error",  {"devDependencies": true}],
+        "react/jsx-props-no-spreading": "off",
         "react/prop-types": 0,
         "no-underscore-dangle": 0,
         "import/imports-first": ["error", "absolute-first"],
@@ -16,7 +18,8 @@
         "no-param-reassign": 0,
         "consistent-return": "off",
         "arrow-body-style": "off",
-        "prefer-template": "off"
+        "prefer-template": "off",
+        "useSelector": "off"
     },
     "globals": {
         "window": true,

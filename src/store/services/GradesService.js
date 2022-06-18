@@ -1,49 +1,49 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/dist/query/react'
 
-export const groupsAPI = createApi({
-    reducerPath: 'groupsAPI',
-    baseQuery: fetchBaseQuery({ baseUrl: '/api/groups' }),
-    tagTypes: ['Groups'],
+export const GradesAPI = createApi({
+    reducerPath: 'GradesAPI',
+    baseQuery: fetchBaseQuery({ baseUrl: '/api/grades' }),
+    tagTypes: ['Grades'],
     endpoints: (build) => ({
-        getGroups: build.query({
+        getGrades: build.query({
             query: (params) => ({ url: '/', params }),
-            providesTags: ['Groups'],
+            providesTags: ['Grades'],
             transformResponse: (response) => response.array
         }),
-        getGroup: build.query({
+        getGrade: build.query({
             query: (id) => ({ url: `/${id}` }),
-            providesTags: ['Groups'],
+            providesTags: ['Grades'],
             transformResponse: (response) => response.object
         }),
-        createGroup: build.mutation({
+        createGrade: build.mutation({
             query: (data) => ({
                 url: '/',
                 method: 'POST',
                 body: data
             }),
-            invalidatesTags: ['Groups']
+            invalidatesTags: ['Grades']
         }),
-        updateGroup: build.mutation({
+        updateGrade: build.mutation({
             query: ({ data, id }) => ({
                 url: `/${id}`,
                 method: 'PUT',
                 body: data
             }),
-            invalidatesTags: ['Groups']
+            invalidatesTags: ['Grades']
         }),
-        deleteGroup: build.query({
+        deleteGrade: build.query({
             query: (id) => ({ url: `/${id}`, method: 'DELETE' }),
-            invalidatesTags: ['Groups']
+            invalidatesTags: ['Grades']
         })
     })
 })
 
 export const {
-    useCreateGroupMutation,
-    useGetGroupsQuery,
-    useGetGroupQuery,
-    useDeleteGroupQuery,
-    useLazyDeleteGroupQuery,
-    useLazyGetGroupQuery,
-    useUpdateGroupMutation
-} = groupsAPI
+    useCreateGradeMutation,
+    useGetGradesQuery,
+    useGetGradeQuery,
+    useLazyGetGradesQuery,
+    useDeleteGradeQuery,
+    useLazyDeleteGradeQuery,
+    useUpdateGradeMutation
+} = GradesAPI

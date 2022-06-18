@@ -35,11 +35,11 @@
     max-width: calc(100vw - 200px - 250px - 0px);
 
     .journal-date {
-        writing-mode: tb;
         transform: rotate(180deg);
         padding: 5px;
         height: 110px;
         width: 36px;
+        writing-mode: vertical-rl;
     }
     .point {
         width: 36px;
@@ -67,4 +67,9 @@
     a:hover {
         background-color: rgba(210, 243, 255, 0.26);
     }
+}
+
+li.link-group:hover {
+    color: blue;
+    text-decoration-line: underline;
 }

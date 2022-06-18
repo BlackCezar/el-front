@@ -12,11 +12,11 @@ import UsersPage from './containers/UsersPage'
 import GroupsPage from './containers/GroupsPage'
 import GroupItemPage from './components/GroupItemPage'
 import Logout from './containers/Logout'
-import ExportPage from './containers/ExportPage'
 import TeachersPage from './containers/TeachersPage'
 import theme from './theme'
 import UserDetailPage from './components/users/UserDetailPage'
 import Layout from './components/Layout'
+import DashboardGroupItemPage from './components/dashboard/DashboardGroupItemPage'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
@@ -31,6 +31,14 @@ root.render(
                             element={
                                 <Layout>
                                     <DashboardPage />
+                                </Layout>
+                            }
+                        />
+                        <Route
+                            path="dashboard/groups/:groupId"
+                            element={
+                                <Layout>
+                                    <DashboardGroupItemPage />
                                 </Layout>
                             }
                         />
@@ -87,14 +95,6 @@ root.render(
                             element={
                                 <Layout>
                                     <UserDetailPage />
-                                </Layout>
-                            }
-                        />
-                        <Route
-                            path="export"
-                            element={
-                                <Layout>
-                                    <ExportPage />
                                 </Layout>
                             }
                         />

@@ -67,7 +67,7 @@ export default function GroupItemPage() {
                     ) : (
                         'Не назначено'
                     )}
-                    <Button onClick={teacherOpenModal}>Назначить</Button>
+                    <Button ml={3} onClick={teacherOpenModal}>Назначить</Button>
                 </Flex>
             </Box>
 

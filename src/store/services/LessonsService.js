@@ -1,49 +1,48 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/dist/query/react'
 
-export const groupsAPI = createApi({
-    reducerPath: 'groupsAPI',
-    baseQuery: fetchBaseQuery({ baseUrl: '/api/groups' }),
-    tagTypes: ['Groups'],
+export const lessonsAPI = createApi({
+    reducerPath: 'lessonsAPI',
+    baseQuery: fetchBaseQuery({ baseUrl: '/api/lessons' }),
+    tagTypes: ['Lessons'],
     endpoints: (build) => ({
-        getGroups: build.query({
+        getLessons: build.query({
             query: (params) => ({ url: '/', params }),
-            providesTags: ['Groups'],
+            providesTags: ['Lessons'],
             transformResponse: (response) => response.array
         }),
-        getGroup: build.query({
+        getLesson: build.query({
             query: (id) => ({ url: `/${id}` }),
-            providesTags: ['Groups'],
+            providesTags: ['Lessons'],
             transformResponse: (response) => response.object
         }),
-        createGroup: build.mutation({
+        createLesson: build.mutation({
             query: (data) => ({
                 url: '/',
                 method: 'POST',
                 body: data
             }),
-            invalidatesTags: ['Groups']
+            invalidatesTags: ['Lessons']
         }),
-        updateGroup: build.mutation({
+        updateLesson: build.mutation({
             query: ({ data, id }) => ({
                 url: `/${id}`,
                 method: 'PUT',
                 body: data
             }),
-            invalidatesTags: ['Groups']
+            invalidatesTags: ['Lessons']
         }),
-        deleteGroup: build.query({
+        deleteLesson: build.query({
             query: (id) => ({ url: `/${id}`, method: 'DELETE' }),
-            invalidatesTags: ['Groups']
+            invalidatesTags: ['Lessons']
         })
     })
 })
 
 export const {
-    useCreateGroupMutation,
-    useGetGroupsQuery,
-    useGetGroupQuery,
-    useDeleteGroupQuery,
-    useLazyDeleteGroupQuery,
-    useLazyGetGroupQuery,
-    useUpdateGroupMutation
-} = groupsAPI
+    useCreateLessonMutation,
+    useGetLessonsQuery,
+    useGetLessonQuery,
+    useDeleteLessonQuery,
+    useLazyDeleteLessonQuery,
+    useUpdateLessonMutation
+} = lessonsAPI
