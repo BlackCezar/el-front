@@ -1,49 +1,48 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/dist/query/react'
 
-export const groupsAPI = createApi({
-    reducerPath: 'groupsAPI',
-    baseQuery: fetchBaseQuery({ baseUrl: '/api/groups' }),
-    tagTypes: ['Groups'],
+export const pointsAPI = createApi({
+    reducerPath: 'pointsAPI',
+    baseQuery: fetchBaseQuery({ baseUrl: '/api/points' }),
+    tagTypes: ['Points'],
     endpoints: (build) => ({
-        getGroups: build.query({
+        getPoints: build.query({
             query: (params) => ({ url: '/', params }),
-            providesTags: ['Groups'],
+            providesTags: ['Points'],
             transformResponse: (response) => response.array
         }),
-        getGroup: build.query({
+        getPoint: build.query({
             query: (id) => ({ url: `/${id}` }),
-            providesTags: ['Groups'],
+            providesTags: ['Points'],
             transformResponse: (response) => response.object
         }),
-        createGroup: build.mutation({
+        createPoint: build.mutation({
             query: (data) => ({
                 url: '/',
                 method: 'POST',
                 body: data
             }),
-            invalidatesTags: ['Groups']
+            invalidatesTags: ['Points']
         }),
-        updateGroup: build.mutation({
+        updatePoint: build.mutation({
             query: ({ data, id }) => ({
                 url: `/${id}`,
                 method: 'PUT',
                 body: data
             }),
-            invalidatesTags: ['Groups']
+            invalidatesTags: ['Points']
         }),
-        deleteGroup: build.query({
+        deletePoint: build.query({
             query: (id) => ({ url: `/${id}`, method: 'DELETE' }),
-            invalidatesTags: ['Groups']
+            invalidatesTags: ['Points']
         })
     })
 })
 
 export const {
-    useCreateGroupMutation,
-    useGetGroupsQuery,
-    useGetGroupQuery,
-    useDeleteGroupQuery,
-    useLazyDeleteGroupQuery,
-    useLazyGetGroupQuery,
-    useUpdateGroupMutation
-} = groupsAPI
+    useCreatePointMutation,
+    useGetPointsQuery,
+    useGetPointQuery,
+    useDeletePointQuery,
+    useLazyDeletePointQuery,
+    useUpdatePointMutation
+} = pointsAPI

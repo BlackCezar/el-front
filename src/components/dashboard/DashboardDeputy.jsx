@@ -1,8 +1,10 @@
 import { ArrowBackIcon } from "@chakra-ui/icons"
-import { Box, Flex, Heading, IconButton, Text } from "@chakra-ui/react"
+import { Box,  Flex, Heading, IconButton, Text } from "@chakra-ui/react"
 import React from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 import { useGetGroupsQuery } from "../../store/services/GroupsService"
+
+
 
 export default function DashboardDeputy() {
     const navigate = useNavigate()
@@ -16,7 +18,7 @@ export default function DashboardDeputy() {
                     onClick={() => navigate(-1)}
                     mr={2}
                 />
-                Классы
+                Выберите классы
             </Flex></Heading>
         <Box mt={3}
             mb={3}
@@ -30,7 +32,7 @@ export default function DashboardDeputy() {
                         Открыть {g.name}</Text>
                 </NavLink>
             ))}
-
         </Box>
+   
     </div>
 }

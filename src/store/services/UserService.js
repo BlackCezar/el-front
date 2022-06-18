@@ -13,15 +13,16 @@ export const userAPI = createApi({
             })
         }),
         checkConnection: build.query({
-            query: () => ({ url: '/check' })
+            query: () => ({ url: '/check' }),
+            invalidatesTags: ['Users']
         }),
         logoutUser: build.query({
-            query: () => ({ url: '/logout' })
+            query: () => ({ url: '/logout' }),
+            invalidatesTags: ['Users']
         }),
         getUsers: build.query({
             query: (params) => {
-                console.log(params)
-                return { url: '/', params: params }},
+                return { url: '/', params }},
             providesTags: ['Users'],
             transformResponse: (response) => response.array
         }),

@@ -25,6 +25,7 @@ import {
 import UserModal from '../components/users/UserModal'
 
 export default function UsersPage() {
+    const user = useSelector((state) => state.user.object)
     const { data: users, isLoading, refetch: usersRefetch } = useGetUsersQuery()
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [deleteUser] = useLazyDeleteUsersQuery()
@@ -52,122 +53,125 @@ export default function UsersPage() {
         setUserForm(newVal)
     }
 
-    const user = useSelector((state) => state.user.object)
+    if (user && user.role) {
+        if ( ['Admin'].includes(user.role)) {
+            return (
+                <div>
+                    <Box borderWidth="1px" borderRadius="10" boxShadow="sm">
+                        {isLoading ? (
+                            <Spinner size="xs" />
+                        ) : (
+                            <TableContainer>
+                                <Table variant="simple">
+                                    <Thead>
+                                        <Tr>
+                                            <Th>Имя</Th>
+                                            <Th>Логин</Th>
+                                            <Th>Телефон</Th>
+                                            <Th>Роль</Th>
+                                            <Th>Класс</Th>
+                                            <Th>ФИО ребенка / родителя</Th>
+                                            <Th />
+                                        </Tr>
+                                    </Thead>
+                                    <Tbody>
+                                        {users &&
+                                            users.map((u) => (
+                                                <Tr key={u._id}>
+                                                    <Td>{u.fullname}</Td>
+                                                    <Td>{u.login}</Td>
+                                                    <Td>{u.phone}</Td>
+                                                    <Td>
+                                                        {u.role === 'Admin' && (
+                                                            <Badge>
+                                                                Администратор
+                                                            </Badge>
+                                                        )}
+                                                        {u.role === 'Student' && (
+                                                            <Badge>Ученик</Badge>
+                                                        )}
+                                                        {u.role === 'Teacher' && (
+                                                            <Badge>Учитель</Badge>
+                                                        )}
+                                                        {u.role ===
+                                                            'ClassRoomTeacher' && (
+                                                            <Badge>
+                                                                Классный рук.
+                                                            </Badge>
+                                                        )}
+                                                        {u.role === 'Deputy' && (
+                                                            <Badge>Зам.</Badge>
+                                                        )}
+                                                        {u.role === 'Parent' && (
+                                                            <Badge>Родитель</Badge>
+                                                        )}
+                                                    </Td>
+                                                    <Td>
+                                                        {u.group && u.group.name}
+                                                    </Td>
+                                                    <Td>
+                                                        {u.parent &&
+                                                            u.parent.fullname}
+                                                    </Td>
+                                                    <Td>
+                                                        <IconButton
+                                                            onClick={() => {
+                                                                selectUser(u)
+                                                                setUserForm({
+                                                                    ...u
+                                                                })
+                                                                onOpen()
+                                                            }}
+                                                            mr="2"
+                                                            colorScheme="yellow"
+                                                            icon={<EditIcon />}
+                                                            aria-label="Edit"
+                                                        />
+                                                        <IconButton
+                                                            onClick={async () => {
+                                                                await deleteUser(
+                                                                    u._id
+                                                                )
+                                                                usersRefetch()
+                                                            }}
+                                                            colorScheme="red"
+                                                            icon={<DeleteIcon />}
+                                                            aria-label="Delete"
+                                                        />
+                                                    </Td>
+                                                </Tr>
+                                            ))}
+                                    </Tbody>
+                                </Table>
+                            </TableContainer>
+                        )}
+    
+                        <Center m="2">
+                            <Button
+                                onClick={() => {
+                                    selectUser(null)
+                                    onOpen()
+                                }}
+                                colorScheme="telegram"
+                            >
+                                Добавить пользователя
+                            </Button>
+                        </Center>
+    
+                        <UserModal
+                            isOpen={isOpen}
+                            onClose={onClose}
+                            user={selectedUser}
+                            handler={handleUserForm}
+                            data={userFrom}
+                        />
+                    </Box>
+                </div>
+            )
+        }
+        return <Navigate to="/404" />
+    } 
+    return <Center><Center><Spinner size='xs' /></Center></Center>
 
-    if (user && user.role && ['Admin'].includes(user.role)) {
-        return (
-            <div>
-                <Box borderWidth="1px" borderRadius="10" boxShadow="sm">
-                    {isLoading ? (
-                        <Spinner size="xs" />
-                    ) : (
-                        <TableContainer>
-                            <Table variant="simple">
-                                <Thead>
-                                    <Tr>
-                                        <Th>Имя</Th>
-                                        <Th>Логин</Th>
-                                        <Th>Телефон</Th>
-                                        <Th>Роль</Th>
-                                        <Th>Класс</Th>
-                                        <Th>ФИО ребенка / родителя</Th>
-                                        <Th />
-                                    </Tr>
-                                </Thead>
-                                <Tbody>
-                                    {users &&
-                                        users.map((u) => (
-                                            <Tr key={u._id}>
-                                                <Td>{u.fullname}</Td>
-                                                <Td>{u.login}</Td>
-                                                <Td>{u.phone}</Td>
-                                                <Td>
-                                                    {u.role === 'Admin' && (
-                                                        <Badge>
-                                                            Администратор
-                                                        </Badge>
-                                                    )}
-                                                    {u.role === 'Student' && (
-                                                        <Badge>Ученик</Badge>
-                                                    )}
-                                                    {u.role === 'Teacher' && (
-                                                        <Badge>Учитель</Badge>
-                                                    )}
-                                                    {u.role ===
-                                                        'ClassRoomTeacher' && (
-                                                        <Badge>
-                                                            Классный рук.
-                                                        </Badge>
-                                                    )}
-                                                    {u.role === 'Deputy' && (
-                                                        <Badge>Зам.</Badge>
-                                                    )}
-                                                    {u.role === 'Parent' && (
-                                                        <Badge>Родитель</Badge>
-                                                    )}
-                                                </Td>
-                                                <Td>
-                                                    {u.group && u.group.name}
-                                                </Td>
-                                                <Td>
-                                                    {u.parent &&
-                                                        u.parent.fullname}
-                                                </Td>
-                                                <Td>
-                                                    <IconButton
-                                                        onClick={() => {
-                                                            selectUser(u)
-                                                            setUserForm({
-                                                                ...u
-                                                            })
-                                                            onOpen()
-                                                        }}
-                                                        mr="2"
-                                                        colorScheme="yellow"
-                                                        icon={<EditIcon />}
-                                                        aria-label="Edit"
-                                                    />
-                                                    <IconButton
-                                                        onClick={async () => {
-                                                            await deleteUser(
-                                                                u._id
-                                                            )
-                                                            usersRefetch()
-                                                        }}
-                                                        colorScheme="red"
-                                                        icon={<DeleteIcon />}
-                                                        aria-label="Delete"
-                                                    />
-                                                </Td>
-                                            </Tr>
-                                        ))}
-                                </Tbody>
-                            </Table>
-                        </TableContainer>
-                    )}
-
-                    <Center m="2">
-                        <Button
-                            onClick={() => {
-                                selectUser(null)
-                                onOpen()
-                            }}
-                            colorScheme="telegram"
-                        >
-                            Добавить пользователя
-                        </Button>
-                    </Center>
-
-                    <UserModal
-                        isOpen={isOpen}
-                        onClose={onClose}
-                        user={selectedUser}
-                        handler={handleUserForm}
-                        data={userFrom}
-                    />
-                </Box>
-            </div>
-        )
-    }
-    return <Navigate to="404" />
+   
 }

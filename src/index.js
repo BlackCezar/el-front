@@ -12,7 +12,6 @@ import UsersPage from './containers/UsersPage'
 import GroupsPage from './containers/GroupsPage'
 import GroupItemPage from './components/GroupItemPage'
 import Logout from './containers/Logout'
-import ExportPage from './containers/ExportPage'
 import TeachersPage from './containers/TeachersPage'
 import theme from './theme'
 import UserDetailPage from './components/users/UserDetailPage'
@@ -96,14 +95,6 @@ root.render(
                             element={
                                 <Layout>
                                     <UserDetailPage />
-                                </Layout>
-                            }
-                        />
-                        <Route
-                            path="export"
-                            element={
-                                <Layout>
-                                    <ExportPage />
                                 </Layout>
                             }
                         />

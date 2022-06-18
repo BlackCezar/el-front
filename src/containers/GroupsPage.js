@@ -119,49 +119,52 @@ export default function GroupsPage() {
 
     const user = useSelector((state) => state.user.object)
 
-    if (['Deputy'].includes(user.role)) {
-        return (
-            <div>
-                <Flex justifyContent="space-between">
-                    <Heading mb={2}>Список классов</Heading>
-                    <Button ml={2} colorScheme="green" onClick={onOpen}>
-                        Добавить класс
-                    </Button>
-                </Flex>
-                {isGroupLoading && (
-                    <Center>
-                        <Spinner />
-                    </Center>
-                )}
-
-                <TableContainer>
-                    <Table variant="simple" colorScheme="telegram">
-                        <Thead>
-                            <Tr>
-                                <Th>Номер класса</Th>
-                                <Th>Действия</Th>
-                            </Tr>
-                        </Thead>
-                        <Tbody>
-                            {groups && groups.length ? (
-                                renderGroups(groups)
-                            ) : (
+    if (user && user.role) {
+        if (['Deputy'].includes(user.role)) {
+            return (
+                <div>
+                    <Flex justifyContent="space-between">
+                        <Heading mb={2}>Список классов</Heading>
+                        <Button ml={2} colorScheme="green" onClick={onOpen}>
+                            Добавить класс
+                        </Button>
+                    </Flex>
+                    {isGroupLoading && (
+                        <Center>
+                            <Spinner />
+                        </Center>
+                    )}
+    
+                    <TableContainer>
+                        <Table variant="simple" colorScheme="telegram">
+                            <Thead>
                                 <Tr>
-                                    <Td>
-                                        <Text>Нет классов</Text>
-                                    </Td>
-                                    <Td />
+                                    <Th>Номер класса</Th>
+                                    <Th>Действия</Th>
                                 </Tr>
-                            )}
-                        </Tbody>
-                    </Table>
-                </TableContainer>
-                <Modal isOpen={isOpen} onClose={onClose}>
-                    <ModalOverlay />
-                    <GroupsContent onSubmit={createGroup} onClose={onClose} />
-                </Modal>
-            </div>
-        )
-    }
-    return <Navigate to="404" />
+                            </Thead>
+                            <Tbody>
+                                {groups && groups.length ? (
+                                    renderGroups(groups)
+                                ) : (
+                                    <Tr>
+                                        <Td>
+                                            <Text>Нет классов</Text>
+                                        </Td>
+                                        <Td />
+                                    </Tr>
+                                )}
+                            </Tbody>
+                        </Table>
+                    </TableContainer>
+                    <Modal isOpen={isOpen} onClose={onClose}>
+                        <ModalOverlay />
+                        <GroupsContent onSubmit={createGroup} onClose={onClose} />
+                    </Modal>
+                </div>
+            )
+        }
+        return <Navigate to="/404" />
+    } 
+    return <Center><Center><Spinner size='xs' /></Center></Center>
 }

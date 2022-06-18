@@ -1,0 +1,15 @@
+.journal-date {
+    cursor: pointer;
+    transition: all .2s linear;
+}
+.journal-date > div {
+    display: flex;
+    align-items: center;
+}
+.journal-date input {
+    max-width: 50px;
+}
+.journal-date:hover {
+    background-color: rgb(235, 242, 255);
+    border-color: rgb(235, 242, 255);
+}

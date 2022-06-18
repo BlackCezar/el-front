@@ -79,7 +79,7 @@ export default function Layout({ children }) {
                         СУНЦ СВФУ
                     </Heading>
                     <Divider mb="3" />
-                    {['Student', 'Teacher', 'Parent', 'Deputy'].includes(
+                    {['Student', 'Parent', 'Deputy'].includes(
                         user.role
                     ) && (
                         <Link to="/dashboard">
@@ -92,7 +92,7 @@ export default function Layout({ children }) {
                             </Button>
                         </Link>
                     )}
-                    {['Student', 'Teacher', 'ClassRoomTeacher'].includes(
+                    {['Student', 'Teacher'].includes(
                         user.role
                     ) && (
                         <Link to="/journal">
@@ -146,17 +146,6 @@ export default function Layout({ children }) {
                                 variant="ghost"
                             >
                                 Учетные записи
-                            </Button>
-                        </Link>
-                    )}
-                    {['ClassRoomTeacher'].includes(user.role) && (
-                        <Link to="/export">
-                            <Button
-                                w="100%"
-                                colorScheme="telegram"
-                                variant="ghost"
-                            >
-                                Экспорт
                             </Button>
                         </Link>
                     )}

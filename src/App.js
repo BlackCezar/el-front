@@ -49,7 +49,7 @@ function App() {
         setPasswordInput({
             touched: true,
             value: val,
-            valid: val !== '' && val !== '' && String(val).length > 4
+            valid: val !== '' && val !== '' && String(val).length > 3
         })
     }
 
@@ -70,9 +70,9 @@ function App() {
             if (role === 'Deputy') history("/groups");
             if (role === 'Admin') history("/users");
             if (role === 'Student') history("/dashboard");
-            if (role === 'Teacher') history("/dashboard");
+            if (role === 'Teacher') history("/journal");
             if (role === 'Parent') history("/dashboard");
-            if (role === 'ClassRoomTeacher') history("/journal");
+            if (role === 'ClassRoomTeacher') history("/brs");
         }
     }, [data])
     return (
