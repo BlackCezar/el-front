@@ -17,18 +17,23 @@ import { Navigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { useGetLessonsQuery } from '../store/services/LessonsService'
 import JournalTeacher from '../components/journal/JournalTeacher'
+import JournalStudent from '../components/journal/JournalStudent'
 
 export default function BRSPage() {
-    const user = useSelector(state => state.user.object)
-    const {data: lessons} = useGetLessonsQuery({teacher: user._id}) 
+    const user = useSelector((state) => state.user.object)
+    const { data: lessons } = useGetLessonsQuery({ teacher: user._id })
     const groupdLesson = useMemo(() => {
         const list = {}
         if (lessons) {
-            lessons.forEach(l => {
+            lessons.forEach((l) => {
                 const gn = l.group.name
-                if (!list[`${gn}-${l.subject}`]) list[`${gn}-${l.subject}`] = {...l.group, subject: l.subject}
-            });
-        } 
+                if (!list[`${gn}-${l.subject}`])
+                    list[`${gn}-${l.subject}`] = {
+                        ...l.group,
+                        subject: l.subject
+                    }
+            })
+        }
         return list
     }, [lessons])
 
@@ -44,9 +49,12 @@ export default function BRSPage() {
         return daysList
     }, [])
 
-
     if (user && user.role) {
-        if (user.role === 'Teacher') return <JournalTeacher groupdLesson={groupdLesson} lessons={lessons} />
+        if (user.role === 'Teacher')
+            return (
+                <JournalTeacher groupdLesson={groupdLesson} lessons={lessons} />
+            )
+        if (user.role === 'Student') return <JournalStudent lessons={lessons} />
         if (['Student', 'Teacher', 'ClassRoomTeacher'].includes(user.role)) {
             return (
                 <div>
@@ -123,7 +131,7 @@ export default function BRSPage() {
                             </Box>
                         </Flex>
                     </Box>
-    
+
                     <Box boxShadow="md" mt={20} p={4}>
                         <Flex justifyContent="space-between">
                             <Box w="100%" mr="5" borderRight="1px solid blue">
@@ -144,6 +152,12 @@ export default function BRSPage() {
             )
         }
         return <Navigate to="/404" />
-    } 
-    return <Center><Center><Spinner size='xs' /></Center></Center>
+    }
+    return (
+        <Center>
+            <Center>
+                <Spinner size="xs" />
+            </Center>
+        </Center>
+    )
 }

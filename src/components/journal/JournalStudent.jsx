@@ -1,7 +1,6 @@
 import { ArrowBackIcon, CheckIcon, CloseIcon, EditIcon } from '@chakra-ui/icons'
 import {
     Box,
-    Button,
     ButtonGroup,
     Editable,
     EditableInput,
@@ -10,8 +9,6 @@ import {
     Heading,
     IconButton,
     Input,
-    List,
-    ListItem,
     Table,
     TableContainer,
     Tbody,
@@ -19,7 +16,6 @@ import {
     Th,
     Thead,
     Tr,
-    useDisclosure,
     useEditableControls
 } from '@chakra-ui/react'
 import React from 'react'
@@ -29,22 +25,22 @@ import {
     useLazyGetGradesQuery,
     useUpdateGradeMutation
 } from '../../store/services/GradesService'
-import { useLazyGetGroupQuery } from '../../store/services/GroupsService'
-import AddGrade from './AddGrade'
 import '../../assets/scss/Journal.scss'
 import { useUpdateLessonMutation } from '../../store/services/LessonsService'
+import { useEffect } from 'react'
 
-export default function JournalTeacher({ groupdLesson, lessons }) {
-    // const user = useSelector(state => state.user.object)
+export default function JournalStudent({ lessons }) {
+    const user = useSelector((state) => state.user.object)
+    const [group, setGroup] = useState(null)
+    useEffect(() => {
+        if (user && user.group && user.group._id) setGroup(user.group)
+    }, [user])
     const [subject, setSubject] = React.useState(false)
-    const [activeLessons, setActiveLessons] = React.useState([])
     const [getGrades, { data: grades }] = useLazyGetGradesQuery()
-    const [getGroup, { data: group }] = useLazyGetGroupQuery()
     const [createGrade] = useCreateGradeMutation()
     const [updateGrade] = useUpdateGradeMutation()
     const [updateLesson] = useUpdateLessonMutation()
     const [field, selectField] = React.useState(null)
-    const { isOpen, onOpen, onClose } = useDisclosure()
     const [grade, setGrade] = React.useState({
         student: '',
         lesson: '',
@@ -66,12 +62,7 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
         },
         [grades]
     )
-    const goTo = (obj) => {
-        setActiveLessons(lessons.filter((l) => l.subject === obj.subject))
-        setSubject(obj)
-        getGrades({ group: obj._id })
-        getGroup(obj._id)
-    }
+
     const days = React.useMemo(() => {
         const arr = []
         if (activeLessons && Array.isArray(activeLessons)) {
@@ -81,7 +72,7 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
         }
         return arr
     }, [activeLessons])
-    return subject && subject.name ? (
+    return (
         <div>
             <Heading mb={5}>
                 <IconButton
@@ -89,9 +80,6 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
                     icon={<ArrowBackIcon />}
                 />{' '}
                 {subject.name} - {subject.subject}
-                <Button float="right" onClick={onOpen}>
-                    Добавить оценку
-                </Button>
             </Heading>
 
             <Box borderWidth="1px" borderColor="blue">
@@ -175,15 +163,6 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
                         </Tbody>
                     </Table>
                 </TableContainer>
-                <AddGrade
-                    object={grade}
-                    students={group && group.students ? group.students : []}
-                    setObject={setGrade}
-                    lessons={activeLessons}
-                    action={createGrade}
-                    isOpen={isOpen}
-                    onClose={onClose}
-                />
             </Box>
 
             {field && (
@@ -251,23 +230,6 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
                     </Flex>
                 </Box>
             )}
-        </div>
-    ) : (
-        <div>
-            <Heading>Выберите класс с дисциплиной</Heading>
-
-            <List>
-                {groupdLesson &&
-                    Object.keys(groupdLesson).map((l) => (
-                        <ListItem
-                            className="link-group"
-                            onClick={() => goTo(groupdLesson[l])}
-                            mb={3}
-                        >
-                            {l.replace('-', '  ')}
-                        </ListItem>
-                    ))}
-            </List>
         </div>
     )
 }
