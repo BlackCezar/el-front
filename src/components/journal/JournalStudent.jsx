@@ -1,85 +1,94 @@
-import { ArrowBackIcon, CheckIcon, CloseIcon, EditIcon } from '@chakra-ui/icons'
+import React, { useEffect, useState, useMemo } from 'react'
+import { ArrowBackIcon } from '@chakra-ui/icons'
 import {
     Box,
-    ButtonGroup,
-    Editable,
-    EditableInput,
-    EditablePreview,
     Flex,
     Heading,
     IconButton,
-    Input,
     Table,
     TableContainer,
     Tbody,
     Td,
+    Text,
     Th,
     Thead,
-    Tr,
-    useEditableControls
+    Tr
 } from '@chakra-ui/react'
-import React from 'react'
-// import { useSelector } from 'react-redux'
-import {
-    useCreateGradeMutation,
-    useLazyGetGradesQuery,
-    useUpdateGradeMutation
-} from '../../store/services/GradesService'
+import { useSelector } from 'react-redux'
+import { useLazyGetGradesQuery } from '../../store/services/GradesService'
 import '../../assets/scss/Journal.scss'
-import { useUpdateLessonMutation } from '../../store/services/LessonsService'
-import { useEffect } from 'react'
+import { useLazyGetLessonsQuery } from '../../store/services/LessonsService'
+import { useLazyGetGroupsQuery } from '../../store/services/GroupsService'
 
-export default function JournalStudent({ lessons }) {
+const groupBy = function (xs, key) {
+    return xs.reduce((rv, x) => {
+        ;(rv[x[key]] = rv[x[key]] || []).push(x)
+        return rv
+    }, {})
+}
+
+export default function JournalStudent() {
     const user = useSelector((state) => state.user.object)
-    const [group, setGroup] = useState(null)
+    const [getGroup, { data: groups, isLoading }] = useLazyGetGroupsQuery()
+    const [groupedLessons, setGroupedLessons] = useState([])
+    const [getLessons, { data: lessons }] = useLazyGetLessonsQuery()
     useEffect(() => {
-        if (user && user.group && user.group._id) setGroup(user.group)
-    }, [user])
-    const [subject, setSubject] = React.useState(false)
-    const [getGrades, { data: grades }] = useLazyGetGradesQuery()
-    const [createGrade] = useCreateGradeMutation()
-    const [updateGrade] = useUpdateGradeMutation()
-    const [updateLesson] = useUpdateLessonMutation()
-    const [field, selectField] = React.useState(null)
-    const [grade, setGrade] = React.useState({
-        student: '',
-        lesson: '',
-        number: '',
-        date: new Date().toLocaleDateString('ru-RU')
-    })
-    const getColSpan = React.useCallback(
-        (day, gradesL) => {
-            if (gradesL) {
-                const list = gradesL.filter((g) => g.date === day)
-                const students = []
-                list.forEach((g) => {
-                    if (students[g.student._id]) students[g.student._id] += 1
-                    else students[g.student._id] = 1
-                })
-                return Object.values(students).sort()[0] + 1
-            }
-            return 1
-        },
-        [grades]
-    )
-
-    const days = React.useMemo(() => {
-        const arr = []
-        if (activeLessons && Array.isArray(activeLessons)) {
-            for (let i = 0; i < activeLessons.length; i += 1) {
-                arr.push(activeLessons[i].date)
-            }
+        if (
+            user &&
+            !isLoading &&
+            groups &&
+            groups.length &&
+            groups.length > 0
+        ) {
+            getLessons({ group: groups[0]._id, student: user._id })
+        } else if (user && user._id) {
+            getGroup({ students: user._id })
         }
-        return arr
-    }, [activeLessons])
+    }, [user, groups, isLoading])
+    const [getGrades] = useLazyGetGradesQuery()
+    const [field, selectField] = React.useState(null)
+    // const getColSpan = React.useCallback(
+    //     (day, gradesL) => {
+    //         if (gradesL) {
+    //             const list = gradesL.filter((g) => g.date === day)
+    //             const students = []
+    //             list.forEach((g) => {
+    //                 if (students[g.student._id]) students[g.student._id] += 1
+    //                 else students[g.student._id] = 1
+    //             })
+    //             return Object.values(students).sort()[0] + 1
+    //         }
+    //         return 1
+    //     },
+    //     [grades]
+    // )
+
+    const days = useMemo(() => {
+        const dList = {}
+        if (lessons && lessons.length) {
+            setGroupedLessons(groupBy(lessons, 'subject'))
+
+            lessons.forEach((l) => {
+                getGrades({ lesson: l._id, student: user._id }).then(
+                    (gradeList) => {
+                        const { data } = gradeList
+
+                        if (data && data.length) {
+                            if (dList[l.date]) {
+                                dList[l.date].push(...data)
+                            } else dList[l.date] = [...data]
+                        }
+                    }
+                )
+            })
+        }
+        return dList
+    }, [lessons])
+
     return (
         <div>
             <Heading mb={5}>
-                <IconButton
-                    onClick={() => setSubject(false)}
-                    icon={<ArrowBackIcon />}
-                />{' '}
-                {subject.name} - {subject.subject}
+                <IconButton icon={<ArrowBackIcon />} />{' '}
             </Heading>
 
             <Box borderWidth="1px" borderColor="blue">
@@ -87,77 +96,59 @@ export default function JournalStudent({ lessons }) {
                     <Table>
                         <Thead>
                             <Tr borderWidth={1}>
-                                <Th>Ученик / дата</Th>
-                                {days.map((day) => {
-                                    return (
-                                        <Th
-                                            colSpan={getColSpan(day, grades)}
-                                            borderWidth="1px"
-                                            className={
-                                                field && field.date === day
-                                                    ? 'journal-date active '
-                                                    : 'journal-date'
-                                            }
-                                            onClick={() => {
-                                                const d = lessons.find(
-                                                    (l) => l.date === day
-                                                )
-                                                selectField(d)
-                                            }}
-                                        >
-                                            {day}
-                                        </Th>
-                                    )
-                                })}
+                                <Th>Дисциплина / дата</Th>
+                                {days &&
+                                    Object.keys(days).sort().map((day) => {
+                                        const col = groupBy(days[day], 'date')
+                                        return (
+                                            <Th
+                                                colSpan={col[day].length}
+                                                borderWidth="1px"
+                                                className={
+                                                    field && field.date === day
+                                                        ? 'journal-date active '
+                                                        : 'journal-date'
+                                                }
+                                                onClick={() => {
+                                                    const d = lessons.find(
+                                                        (lsn) =>
+                                                            lsn.date === day
+                                                    )
+                                                    selectField(d)
+                                                }}
+                                            >
+                                                {day}
+                                            </Th>
+                                        )
+                                    })}
                             </Tr>
                         </Thead>
                         <Tbody>
-                            {group && group.students ? (
-                                group.students.map((s) => (
-                                    <Tr p="6px">
-                                        <Td borderWidth={1}>{s.fullname}</Td>
-                                        {days.map((day) => {
-                                            const d = activeLessons.find(
-                                                (l) => l.date === day
-                                            )
-                                            const gradesList = grades
-                                                ? grades.filter(
-                                                      (g) =>
-                                                          g.date === day &&
-                                                          g.student._id ===
-                                                              s._id &&
-                                                          g.lesson._id === d._id
-                                                  )
-                                                : []
-                                            return gradesList.map((g) => (
-                                                <Td borderWidth={1}>
-                                                    <Editable
-                                                        submitOnBlur
-                                                        onSubmit={(val) =>
-                                                            updateGrade({
-                                                                data: {
-                                                                    ...field,
-                                                                    number: val
-                                                                },
-                                                                id: g._id
-                                                            })
-                                                        }
-                                                        defaultValue={g.number}
-                                                    >
-                                                        <EditablePreview />
-                                                        <Input
-                                                            as={EditableInput}
-                                                        />
-                                                        <EditableControls />
-                                                    </Editable>
-                                                </Td>
-                                            ))
-                                        })}
+                            {groupedLessons ? (
+                                Object.keys(groupedLessons).map((lesson) => (
+                                    <Tr p="6px" key={lesson}>
+                                        <Td borderWidth={1}>{lesson}</Td>
+
+                                        {days &&
+                                            Object.keys(days).sort().map((key) => {
+                                                const list = days[key]
+                                                return list
+                                                    .filter(
+                                                        (l) =>
+                                                            l.lesson.subject ===
+                                                            lesson
+                                                    )
+                                                    .map((les) => (
+                                                        <Td borderWidth="1px">
+                                                            {les.number}
+                                                        </Td>
+                                                    ))
+                                            })}
                                     </Tr>
                                 ))
                             ) : (
                                 <Tr>
-                                    <Td>Нет студентов</Td>
+                                    <Td />
                                 </Tr>
                             )}
                         </Tbody>
@@ -172,88 +163,17 @@ export default function JournalStudent({ lessons }) {
                             <Heading mb="5" textAlign="center">
                                 Тема урока
                             </Heading>
-
-                            <Editable
-                                submitOnBlur
-                                onChange={(val) =>
-                                    selectField({
-                                        ...field,
-                                        topic: val
-                                    })
-                                }
-                                onSubmit={(val) =>
-                                    updateLesson({
-                                        data: {
-                                            ...field,
-                                            topic: val
-                                        },
-                                        id: field._id
-                                    })
-                                }
-                                defaultValue="Введите тему урока"
-                                value={field.topic}
-                            >
-                                <EditablePreview />
-                                <Input as={EditableInput} />{' '}
-                                <EditableControls />
-                            </Editable>
+                            <Text>{field.topic}</Text>
                         </Box>
                         <Box w="100%">
                             <Heading mb="5" textAlign="center">
                                 Домашнее задание
                             </Heading>
-                            <Editable
-                                submitOnBlur
-                                onChange={(val) =>
-                                    selectField({
-                                        ...field,
-                                        homework: val
-                                    })
-                                }
-                                onSubmit={(val) =>
-                                    updateLesson({
-                                        data: {
-                                            ...field,
-                                            homework: val
-                                        },
-                                        id: field._id
-                                    })
-                                }
-                                value={field.homework}
-                                defaultValue="Введите домашнее задание"
-                            >
-                                <EditablePreview />
-                                <Input as={EditableInput} />{' '}
-                                <EditableControls />
-                            </Editable>
+                            <Text>{field.homework}</Text>
                         </Box>
                     </Flex>
                 </Box>
             )}
         </div>
-    )
-}
-
-function EditableControls() {
-    const {
-        isEditing,
-        getSubmitButtonProps,
-        getCancelButtonProps,
-        getEditButtonProps
-    } = useEditableControls()
-
-    return isEditing ? (
-        <ButtonGroup justifyContent="center" size="sm">
-            <IconButton icon={<CheckIcon />} {...getSubmitButtonProps()} />
-            <IconButton icon={<CloseIcon />} {...getCancelButtonProps()} />
-        </ButtonGroup>
-    ) : (
-        <Flex justifyContent="center">
-            <IconButton
-                size="sm"
-                icon={<EditIcon />}
-                {...getEditButtonProps()}
-            />
-        </Flex>
     )
 }

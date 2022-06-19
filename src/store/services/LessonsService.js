@@ -41,6 +41,7 @@ export const lessonsAPI = createApi({
 export const {
     useCreateLessonMutation,
     useGetLessonsQuery,
+    useLazyGetLessonsQuery,
     useGetLessonQuery,
     useDeleteLessonQuery,
     useLazyDeleteLessonQuery,

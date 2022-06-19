@@ -55,6 +55,7 @@ export default function AddStudentModal({ isOpen, onClose, group }) {
                     <FormControl>
                         <FormLabel>Выберите из списка</FormLabel>
                         <Select
+                        placeholder="Выберите из списка"
                             value={tch}
                             onChange={(ev) => {
                                 setTch(ev.target.value)

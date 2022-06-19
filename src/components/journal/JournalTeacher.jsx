@@ -8,6 +8,7 @@ import {
     EditablePreview,
     Flex,
     Heading,
+    HStack,
     IconButton,
     Input,
     List,
@@ -26,46 +27,49 @@ import React from 'react'
 // import { useSelector } from 'react-redux'
 import {
     useCreateGradeMutation,
+    useGetGradesQuery,
     useLazyGetGradesQuery,
     useUpdateGradeMutation
 } from '../../store/services/GradesService'
 import { useLazyGetGroupQuery } from '../../store/services/GroupsService'
 import AddGrade from './AddGrade'
+import AddTotalGrade from './AddTotalGrade'
 import '../../assets/scss/Journal.scss'
 import { useUpdateLessonMutation } from '../../store/services/LessonsService'
+
+const groupBy = function (xs, key) {
+    return xs.reduce((rv, x) => {
+        ;(rv[x[key]] = rv[x[key]] || []).push(x)
+        return rv
+    }, {})
+}
 
 export default function JournalTeacher({ groupdLesson, lessons }) {
     // const user = useSelector(state => state.user.object)
     const [subject, setSubject] = React.useState(false)
     const [activeLessons, setActiveLessons] = React.useState([])
     const [getGrades, { data: grades }] = useLazyGetGradesQuery()
+    const { data: firstTotalGrades } = useGetGradesQuery({ date: '1' })
+    const { data: secondTotalGrades } = useGetGradesQuery({ date: '2' })
+    const { data: thirdTotalGrades } = useGetGradesQuery({ date: '3' })
     const [getGroup, { data: group }] = useLazyGetGroupQuery()
     const [createGrade] = useCreateGradeMutation()
     const [updateGrade] = useUpdateGradeMutation()
     const [updateLesson] = useUpdateLessonMutation()
     const [field, selectField] = React.useState(null)
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const {
+        isOpen: isOpenTotal,
+        onOpen: openTotal,
+        onClose: closeTotal
+    } = useDisclosure()
     const [grade, setGrade] = React.useState({
         student: '',
         lesson: '',
         number: '',
         date: new Date().toLocaleDateString('ru-RU')
     })
-    const getColSpan = React.useCallback(
-        (day, gradesL) => {
-            if (gradesL) {
-                const list = gradesL.filter((g) => g.date === day)
-                const students = []
-                list.forEach((g) => {
-                    if (students[g.student._id]) students[g.student._id] += 1
-                    else students[g.student._id] = 1
-                })
-                return Object.values(students).sort()[0] + 1
-            }
-            return 1
-        },
-        [grades]
-    )
+
     const goTo = (obj) => {
         setActiveLessons(lessons.filter((l) => l.subject === obj.subject))
         setSubject(obj)
@@ -73,13 +77,7 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
         getGroup(obj._id)
     }
     const days = React.useMemo(() => {
-        const arr = []
-        if (activeLessons && Array.isArray(activeLessons)) {
-            for (let i = 0; i < activeLessons.length; i += 1) {
-                arr.push(activeLessons[i].date)
-            }
-        }
-        return arr
+        return groupBy(activeLessons, 'date')
     }, [activeLessons])
     return subject && subject.name ? (
         <div>
@@ -92,100 +90,287 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
                 <Button float="right" onClick={onOpen}>
                     Добавить оценку
                 </Button>
+                <Button mr={4} float="right" onClick={openTotal}>
+                    Добавить итоговую оценку
+                </Button>
             </Heading>
 
-            <Box borderWidth="1px" borderColor="blue">
-                <TableContainer>
-                    <Table>
-                        <Thead>
-                            <Tr borderWidth={1}>
-                                <Th>Ученик / дата</Th>
-                                {days.map((day) => {
-                                    return (
-                                        <Th
-                                            colSpan={getColSpan(day, grades)}
-                                            borderWidth="1px"
-                                            className={
-                                                field && field.date === day
-                                                    ? 'journal-date active '
-                                                    : 'journal-date'
-                                            }
-                                            onClick={() => {
-                                                const d = lessons.find(
+            <HStack spacing={4}>
+                <Box borderWidth="1px" borderColor="blue">
+                    <TableContainer>
+                        <Table>
+                            <Thead>
+                                <Tr borderWidth={1}>
+                                    <Th>Ученик / дата</Th>
+                                    {Object.keys(days)
+                                        .sort()
+                                        .map((day) => {
+                                            const activeLesson =
+                                                activeLessons.find(
                                                     (l) => l.date === day
                                                 )
-                                                selectField(d)
-                                            }}
-                                        >
-                                            {day}
-                                        </Th>
-                                    )
-                                })}
-                            </Tr>
-                        </Thead>
-                        <Tbody>
-                            {group && group.students ? (
-                                group.students.map((s) => (
-                                    <Tr p="6px">
-                                        <Td borderWidth={1}>{s.fullname}</Td>
-                                        {days.map((day) => {
-                                            const d = activeLessons.find(
-                                                (l) => l.date === day
-                                            )
                                             const gradesList = grades
-                                                ? grades.filter(
-                                                      (g) =>
-                                                          g.date === day &&
-                                                          g.student._id ===
-                                                              s._id &&
-                                                          g.lesson._id === d._id
-                                                  )
+                                                ? grades
+                                                      .filter(
+                                                          (g) =>
+                                                              g.date === day &&
+                                                              g.lesson._id ===
+                                                                  activeLesson._id
+                                                      )
+                                                      .map((g) => {
+                                                          const studentId =
+                                                              g.student._id
+                                                          return {
+                                                              ...g,
+                                                              student: studentId
+                                                          }
+                                                      })
                                                 : []
-                                            return gradesList.map((g) => (
-                                                <Td borderWidth={1}>
-                                                    <Editable
-                                                        submitOnBlur
-                                                        onSubmit={(val) =>
-                                                            updateGrade({
-                                                                data: {
-                                                                    ...field,
-                                                                    number: val
-                                                                },
-                                                                id: g._id
-                                                            })
-                                                        }
-                                                        defaultValue={g.number}
-                                                    >
-                                                        <EditablePreview />
-                                                        <Input
-                                                            as={EditableInput}
-                                                        />
-                                                        <EditableControls />
-                                                    </Editable>
-                                                </Td>
-                                            ))
+                                            const length = Object.values(
+                                                groupBy(gradesList, 'student')
+                                            )
+                                            return (
+                                                <Th
+                                                    colSpan={
+                                                        length && length.length
+                                                            ? length[0].length
+                                                            : 1
+                                                    }
+                                                    borderWidth="1px"
+                                                    className={
+                                                        field &&
+                                                        field.date === day
+                                                            ? 'journal-date active '
+                                                            : 'journal-date'
+                                                    }
+                                                    onClick={() => {
+                                                        const d = lessons.find(
+                                                            (l) =>
+                                                                l.date === day
+                                                        )
+                                                        selectField(d)
+                                                    }}
+                                                >
+                                                    {day}
+                                                </Th>
+                                            )
                                         })}
-                                    </Tr>
-                                ))
-                            ) : (
-                                <Tr>
-                                    <Td>Нет студентов</Td>
                                 </Tr>
-                            )}
-                        </Tbody>
-                    </Table>
-                </TableContainer>
-                <AddGrade
-                    object={grade}
-                    students={group && group.students ? group.students : []}
-                    setObject={setGrade}
-                    lessons={activeLessons}
-                    action={createGrade}
-                    isOpen={isOpen}
-                    onClose={onClose}
-                />
-            </Box>
+                            </Thead>
+                            <Tbody>
+                                {group && group.students ? (
+                                    group.students.map((s) => (
+                                        <Tr p="6px">
+                                            <Td borderWidth={1}>
+                                                {s.fullname}
+                                            </Td>
+                                            {Object.keys(days)
+                                                .sort()
+                                                .map((day) => {
+                                                    const d =
+                                                        activeLessons.find(
+                                                            (l) =>
+                                                                l.date === day
+                                                        )
+                                                    const gradesList = grades
+                                                        ? grades.filter(
+                                                              (g) =>
+                                                                  g.date ===
+                                                                      day &&
+                                                                  g.student
+                                                                      ._id ===
+                                                                      s._id &&
+                                                                  g.lesson
+                                                                      ._id ===
+                                                                      d._id
+                                                          )
+                                                        : []
+                                                    console.log(gradesList)
+                                                    return gradesList.map(
+                                                        (g) => (
+                                                            <Td borderWidth={1}>
+                                                                <Editable
+                                                                    submitOnBlur
+                                                                    onSubmit={(
+                                                                        val
+                                                                    ) =>
+                                                                        updateGrade(
+                                                                            {
+                                                                                data: {
+                                                                                    ...field,
+                                                                                    number: val
+                                                                                },
+                                                                                id: g._id
+                                                                            }
+                                                                        )
+                                                                    }
+                                                                    defaultValue={
+                                                                        g.number
+                                                                    }
+                                                                >
+                                                                    <EditablePreview />
+                                                                    <Input
+                                                                        as={
+                                                                            EditableInput
+                                                                        }
+                                                                    />
+                                                                    <EditableControls />
+                                                                </Editable>
+                                                            </Td>
+                                                        )
+                                                    )
+                                                })}
+                                        </Tr>
+                                    ))
+                                ) : (
+                                    <Tr>
+                                        <Td>Нет студентов</Td>
+                                    </Tr>
+                                )}
+                            </Tbody>
+                        </Table>
+                    </TableContainer>
+                    <AddGrade
+                        object={grade}
+                        students={group && group.students ? group.students : []}
+                        setObject={setGrade}
+                        lessons={activeLessons}
+                        action={createGrade}
+                        isOpen={isOpen}
+                        onClose={onClose}
+                    />
+                    <AddTotalGrade
+                        object={grade}
+                        students={group && group.students ? group.students : []}
+                        setObject={setGrade}
+                        lessons={activeLessons}
+                        action={createGrade}
+                        isOpen={isOpenTotal}
+                        onClose={closeTotal}
+                    />
+                </Box>
 
+                <Box borderWidth="1px" borderColor="blue">
+                    <TableContainer>
+                        <Table>
+                            <Thead>
+                                <Tr borderWidth={1}>
+                                    <Th>1 Полугодие</Th>
+                                    <Th>2 Полугодие</Th>
+                                    <Th>Итоговая</Th>
+                                </Tr>
+                            </Thead>
+                            <Tbody>
+                                {group && group.students ? (
+                                    group.students.map(() => (
+                                        <Tr p="6px">
+                                            <Td borderWidth={1}>
+                                            {firstTotalGrades &&
+                                                        firstTotalGrades.length && <Editable
+                                                    submitOnBlur
+                                                    onSubmit={(val) =>
+                                                        updateGrade({
+                                                            data: {
+                                                                ...field,
+                                                                number: val
+                                                            },
+                                                            id:
+                                                                firstTotalGrades &&
+                                                                firstTotalGrades.length
+                                                                    ? firstTotalGrades[0]
+                                                                          ._id
+                                                                    : ''
+                                                        })
+                                                    }
+                                                    defaultValue={
+                                                        firstTotalGrades &&
+                                                        firstTotalGrades.length
+                                                            ? firstTotalGrades[0]
+                                                                  .number
+                                                            : ''
+                                                    }
+                                                >
+                                                    <EditablePreview />
+                                                    <Input as={EditableInput} />
+                                                    <EditableControls />
+                                                </Editable>}
+                                            </Td>
+                                            <Td borderWidth={1}>
+                                                {secondTotalGrades &&
+                                                        secondTotalGrades.length &&
+                                                <Editable
+                                                    submitOnBlur
+                                                    onSubmit={(val) =>
+                                                        updateGrade({
+                                                            data: {
+                                                                ...field,
+                                                                number: val
+                                                            },
+                                                            id:
+                                                            secondTotalGrades &&
+                                                                secondTotalGrades.length
+                                                                    ? secondTotalGrades[0]
+                                                                          ._id
+                                                                    : ''
+                                                        })
+                                                    }
+                                                    defaultValue={
+                                                        secondTotalGrades &&
+                                                        secondTotalGrades.length
+                                                            ? secondTotalGrades[0]
+                                                                  .number
+                                                            : ''
+                                                    }
+                                                >
+                                                    <EditablePreview />
+                                                    <Input as={EditableInput} />
+                                                    <EditableControls />
+                                                </Editable>}
+                                            </Td>
+                                            <Td borderWidth={1}>
+                                                {thirdTotalGrades && thirdTotalGrades.length && 
+                                            <Editable
+                                                    submitOnBlur
+                                                    onSubmit={(val) =>
+                                                        updateGrade({
+                                                            data: {
+                                                                ...field,
+                                                                number: val
+                                                            },
+                                                            id:
+                                                            thirdTotalGrades &&
+                                                            thirdTotalGrades.length
+                                                                    ? thirdTotalGrades[0]
+                                                                          ._id
+                                                                    : ''
+                                                        })
+                                                    }
+                                                    defaultValue={
+                                                        thirdTotalGrades &&
+                                                        thirdTotalGrades.length
+                                                            ? thirdTotalGrades[0]
+                                                                  .number
+                                                            : ''
+                                                    }
+                                                >
+                                                    <EditablePreview />
+                                                    <Input as={EditableInput} />
+                                                    <EditableControls />
+                                                </Editable>
+}
+                                            </Td>
+                                        </Tr>
+                                    ))
+                                ) : (
+                                    <Tr>
+                                        <Td>Нет студентов</Td>
+                                    </Tr>
+                                )}
+                            </Tbody>
+                        </Table>
+                    </TableContainer>
+                </Box>
+            </HStack>
             {field && (
                 <Box boxShadow="md" mt={20} p={4}>
                     <Flex justifyContent="space-between">

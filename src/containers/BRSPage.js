@@ -16,6 +16,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { Navigate } from 'react-router-dom'
 import BRSModal from '../components/brs/modal'
+import BRSClassRoomTeacher from '../components/brs/BRSClassRoomTeacher'
 
 export default function BRSPage() {
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -24,6 +25,7 @@ export default function BRSPage() {
 
     if (user && user.role) {
         if (['Student', 'ClassRoomTeacher'].includes(user.role)) {
+            if (user.role === 'ClassRoomTeacher') return <BRSClassRoomTeacher user={user} />
             return (
                 <div>
                     <Box borderWidth="1px" borderColor="blue">

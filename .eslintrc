@@ -15,6 +15,7 @@
         "import/imports-first": ["error", "absolute-first"],
         "import/newline-after-import": "error",
         "import/prefer-default-export": 0,
+        "no-restricted-syntax": ["warn", "WithStatement"],
         "no-param-reassign": 0,
         "consistent-return": "off",
         "arrow-body-style": "off",

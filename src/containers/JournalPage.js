@@ -54,7 +54,7 @@ export default function BRSPage() {
             return (
                 <JournalTeacher groupdLesson={groupdLesson} lessons={lessons} />
             )
-        if (user.role === 'Student') return <JournalStudent lessons={lessons} />
+        if (user.role === 'Student') return <JournalStudent  />
         if (['Student', 'Teacher', 'ClassRoomTeacher'].includes(user.role)) {
             return (
                 <div>

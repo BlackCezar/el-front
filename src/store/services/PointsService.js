@@ -41,6 +41,7 @@ export const pointsAPI = createApi({
 export const {
     useCreatePointMutation,
     useGetPointsQuery,
+    useLazyGetPointsQuery,
     useGetPointQuery,
     useDeletePointQuery,
     useLazyDeletePointQuery,

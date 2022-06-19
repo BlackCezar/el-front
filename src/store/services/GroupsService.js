@@ -6,7 +6,10 @@ export const groupsAPI = createApi({
     tagTypes: ['Groups'],
     endpoints: (build) => ({
         getGroups: build.query({
-            query: (params) => ({ url: '/', params }),
+            query: (params) => {
+                console.log(params)
+                return { url: '/', params }
+            },
             providesTags: ['Groups'],
             transformResponse: (response) => response.array
         }),
@@ -44,6 +47,7 @@ export const {
     useGetGroupQuery,
     useDeleteGroupQuery,
     useLazyDeleteGroupQuery,
+    useLazyGetGroupsQuery,
     useLazyGetGroupQuery,
     useUpdateGroupMutation
 } = groupsAPI
