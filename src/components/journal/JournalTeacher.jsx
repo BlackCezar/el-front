@@ -17,6 +17,7 @@ import {
     TableContainer,
     Tbody,
     Td,
+    Text,
     Th,
     Thead,
     Tr,
@@ -27,7 +28,6 @@ import React from 'react'
 // import { useSelector } from 'react-redux'
 import {
     useCreateGradeMutation,
-    useGetGradesQuery,
     useLazyGetGradesQuery,
     useUpdateGradeMutation
 } from '../../store/services/GradesService'
@@ -44,14 +44,17 @@ const groupBy = function (xs, key) {
     }, {})
 }
 
-export default function JournalTeacher({ groupdLesson, lessons }) {
-    // const user = useSelector(state => state.user.object)
+export default function JournalTeacher({
+    groupdLesson,
+    lessons,
+    refetchLessons
+}) {
     const [subject, setSubject] = React.useState(false)
     const [activeLessons, setActiveLessons] = React.useState([])
     const [getGrades, { data: grades }] = useLazyGetGradesQuery()
-    const { data: firstTotalGrades } = useGetGradesQuery({ date: '1' })
-    const { data: secondTotalGrades } = useGetGradesQuery({ date: '2' })
-    const { data: thirdTotalGrades } = useGetGradesQuery({ date: '3' })
+    const [get1Grades, { data: firstTotalGrades }] = useLazyGetGradesQuery()
+    const [get2Grades, { data: secondTotalGrades }] = useLazyGetGradesQuery()
+    const [get3Grades, { data: thirdTotalGrades }] = useLazyGetGradesQuery()
     const [getGroup, { data: group }] = useLazyGetGroupQuery()
     const [createGrade] = useCreateGradeMutation()
     const [updateGrade] = useUpdateGradeMutation()
@@ -75,10 +78,62 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
         setSubject(obj)
         getGrades({ group: obj._id })
         getGroup(obj._id)
+
+        selectField(null)
+
+        get1Grades({
+            date: '1',
+            subject: obj.subject
+        })
+        get2Grades({
+            date: '2',
+            subject: obj.subject
+        })
+        get3Grades({
+            date: '3',
+            subject: obj.subject
+        })
     }
     const days = React.useMemo(() => {
         return groupBy(activeLessons, 'date')
     }, [activeLessons])
+
+    const renderTotalGrade = React.useCallback(
+        (list) => {
+            const l = list.map((student) => {
+                const firstGrade =
+                    firstTotalGrades &&
+                    firstTotalGrades.length &&
+                    firstTotalGrades.find((t) => t.student._id === student._id)
+
+                const secondGrade =
+                    secondTotalGrades &&
+                    secondTotalGrades.length &&
+                    secondTotalGrades.find((t) => t.student._id === student._id)
+
+                const thirdGrade =
+                    thirdTotalGrades &&
+                    thirdTotalGrades.length &&
+                    thirdTotalGrades.find((t) => t.student._id === student._id)
+
+                return (
+                    <Tr height="65px" p="6px" key={'student-' + student._id}>
+                        <Td borderWidth={1}>
+                            <Text>{firstGrade ? firstGrade.number : ''}</Text>
+                        </Td>
+                        <Td borderWidth={1}>
+                            <Text>{secondGrade ? secondGrade.number : ''}</Text>
+                        </Td>
+                        <Td borderWidth={1}>
+                            <Text>{thirdGrade ? thirdGrade.number : ''}</Text>
+                        </Td>
+                    </Tr>
+                )
+            })
+            return l
+        },
+        [group, thirdTotalGrades, secondTotalGrades, firstTotalGrades]
+    )
     return subject && subject.name ? (
         <div>
             <Heading mb={5}>
@@ -100,11 +155,11 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
                     <TableContainer>
                         <Table>
                             <Thead>
-                                <Tr borderWidth={1}>
+                                <Tr borderWidth={1} height="65px">
                                     <Th>Ученик / дата</Th>
                                     {Object.keys(days)
                                         .sort()
-                                        .map((day) => {
+                                        .map((day, i) => {
                                             const activeLesson =
                                                 activeLessons.find(
                                                     (l) => l.date === day
@@ -129,12 +184,18 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
                                             const length = Object.values(
                                                 groupBy(gradesList, 'student')
                                             )
+                                            console.log(length)
                                             return (
                                                 <Th
+                                                    key={'day-' + i}
                                                     colSpan={
                                                         length && length.length
-                                                            ? length[0].length
-                                                            : 1
+                                                            ? length[0]
+                                                                  .length === 1
+                                                                ? 1
+                                                                : length[0]
+                                                                      .length
+                                                            : 0
                                                     }
                                                     borderWidth="1px"
                                                     className={
@@ -146,7 +207,10 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
                                                     onClick={() => {
                                                         const d = lessons.find(
                                                             (l) =>
-                                                                l.date === day
+                                                                l.date ===
+                                                                    day &&
+                                                                l.subject ===
+                                                                    subject.subject
                                                         )
                                                         selectField(d)
                                                     }}
@@ -159,8 +223,13 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
                             </Thead>
                             <Tbody>
                                 {group && group.students ? (
-                                    group.students.map((s) => (
-                                        <Tr p="6px">
+                                    group.students.map((s, i) => (
+                                        <Tr
+                                            p="6px"
+                                            height="65px"
+                                            key={'st-' + s._id + i}
+                                            maxHeight="65px"
+                                        >
                                             <Td borderWidth={1}>
                                                 {s.fullname}
                                             </Td>
@@ -170,7 +239,10 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
                                                     const d =
                                                         activeLessons.find(
                                                             (l) =>
-                                                                l.date === day
+                                                                l.date ===
+                                                                    day &&
+                                                                l.subject ===
+                                                                    subject.subject
                                                         )
                                                     const gradesList = grades
                                                         ? grades.filter(
@@ -185,39 +257,72 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
                                                                       d._id
                                                           )
                                                         : []
-                                                    console.log(gradesList)
-                                                    return gradesList.map(
-                                                        (g) => (
-                                                            <Td borderWidth={1}>
-                                                                <Editable
-                                                                    submitOnBlur
-                                                                    onSubmit={(
-                                                                        val
-                                                                    ) =>
-                                                                        updateGrade(
-                                                                            {
-                                                                                data: {
-                                                                                    ...field,
-                                                                                    number: val
-                                                                                },
-                                                                                id: g._id
-                                                                            }
-                                                                        )
+
+                                                    const MaxLength = grades
+                                                        ? grades.filter(
+                                                              (g) =>
+                                                                  g.date ===
+                                                                      day &&
+                                                                  g.lesson
+                                                                      ._id ===
+                                                                      d._id
+                                                          )
+                                                        : []
+
+                                                    console.log(MaxLength)
+                                                    return gradesList &&
+                                                        gradesList.length ? (
+                                                        gradesList.map(
+                                                            (g, ind) => (
+                                                                <Td
+                                                                    borderWidth={
+                                                                        1
                                                                     }
-                                                                    defaultValue={
-                                                                        g.number
+                                                                    key={
+                                                                        g._id +
+                                                                        ind * 20
                                                                     }
                                                                 >
-                                                                    <EditablePreview />
-                                                                    <Input
-                                                                        as={
-                                                                            EditableInput
+                                                                    <Editable
+                                                                        submitOnBlur
+                                                                        onSubmit={(
+                                                                            val
+                                                                        ) =>
+                                                                            updateGrade(
+                                                                                {
+                                                                                    data: {
+                                                                                        ...field,
+                                                                                        number: val
+                                                                                    },
+                                                                                    id: g._id
+                                                                                }
+                                                                            )
                                                                         }
-                                                                    />
-                                                                    <EditableControls />
-                                                                </Editable>
-                                                            </Td>
+                                                                        defaultValue={
+                                                                            g.number
+                                                                        }
+                                                                    >
+                                                                        <Flex alignItems="center">
+                                                                            <EditablePreview />
+                                                                            <Input
+                                                                                as={
+                                                                                    EditableInput
+                                                                                }
+                                                                            />
+                                                                            <EditableControls />
+                                                                        </Flex>
+                                                                    </Editable>
+                                                                </Td>
+                                                            )
                                                         )
+                                                    ) : (
+                                                        <Td
+                                                            borderWidth="1px"
+                                                            colSpan={
+                                                                MaxLength &&
+                                                                MaxLength.length
+                                                            }
+                                                        />
                                                     )
                                                 })}
                                         </Tr>
@@ -243,7 +348,7 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
                         object={grade}
                         students={group && group.students ? group.students : []}
                         setObject={setGrade}
-                        lessons={activeLessons}
+                        subject={subject ? subject.subject : ''}
                         action={createGrade}
                         isOpen={isOpenTotal}
                         onClose={closeTotal}
@@ -254,7 +359,7 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
                     <TableContainer>
                         <Table>
                             <Thead>
-                                <Tr borderWidth={1}>
+                                <Tr height="65px" borderWidth={1}>
                                     <Th>1 Полугодие</Th>
                                     <Th>2 Полугодие</Th>
                                     <Th>Итоговая</Th>
@@ -262,105 +367,7 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
                             </Thead>
                             <Tbody>
                                 {group && group.students ? (
-                                    group.students.map(() => (
-                                        <Tr p="6px">
-                                            <Td borderWidth={1}>
-                                            {firstTotalGrades &&
-                                                        firstTotalGrades.length && <Editable
-                                                    submitOnBlur
-                                                    onSubmit={(val) =>
-                                                        updateGrade({
-                                                            data: {
-                                                                ...field,
-                                                                number: val
-                                                            },
-                                                            id:
-                                                                firstTotalGrades &&
-                                                                firstTotalGrades.length
-                                                                    ? firstTotalGrades[0]
-                                                                          ._id
-                                                                    : ''
-                                                        })
-                                                    }
-                                                    defaultValue={
-                                                        firstTotalGrades &&
-                                                        firstTotalGrades.length
-                                                            ? firstTotalGrades[0]
-                                                                  .number
-                                                            : ''
-                                                    }
-                                                >
-                                                    <EditablePreview />
-                                                    <Input as={EditableInput} />
-                                                    <EditableControls />
-                                                </Editable>}
-                                            </Td>
-                                            <Td borderWidth={1}>
-                                                {secondTotalGrades &&
-                                                        secondTotalGrades.length &&
-                                                <Editable
-                                                    submitOnBlur
-                                                    onSubmit={(val) =>
-                                                        updateGrade({
-                                                            data: {
-                                                                ...field,
-                                                                number: val
-                                                            },
-                                                            id:
-                                                            secondTotalGrades &&
-                                                                secondTotalGrades.length
-                                                                    ? secondTotalGrades[0]
-                                                                          ._id
-                                                                    : ''
-                                                        })
-                                                    }
-                                                    defaultValue={
-                                                        secondTotalGrades &&
-                                                        secondTotalGrades.length
-                                                            ? secondTotalGrades[0]
-                                                                  .number
-                                                            : ''
-                                                    }
-                                                >
-                                                    <EditablePreview />
-                                                    <Input as={EditableInput} />
-                                                    <EditableControls />
-                                                </Editable>}
-                                            </Td>
-                                            <Td borderWidth={1}>
-                                                {thirdTotalGrades && thirdTotalGrades.length && 
-                                            <Editable
-                                                    submitOnBlur
-                                                    onSubmit={(val) =>
-                                                        updateGrade({
-                                                            data: {
-                                                                ...field,
-                                                                number: val
-                                                            },
-                                                            id:
-                                                            thirdTotalGrades &&
-                                                            thirdTotalGrades.length
-                                                                    ? thirdTotalGrades[0]
-                                                                          ._id
-                                                                    : ''
-                                                        })
-                                                    }
-                                                    defaultValue={
-                                                        thirdTotalGrades &&
-                                                        thirdTotalGrades.length
-                                                            ? thirdTotalGrades[0]
-                                                                  .number
-                                                            : ''
-                                                    }
-                                                >
-                                                    <EditablePreview />
-                                                    <Input as={EditableInput} />
-                                                    <EditableControls />
-                                                </Editable>
-}
-                                            </Td>
-                                        </Tr>
-                                    ))
+                                    renderTotalGrade(group.students)
                                 ) : (
                                     <Tr>
                                         <Td>Нет студентов</Td>
@@ -387,7 +394,8 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
                                         topic: val
                                     })
                                 }
-                                onSubmit={(val) =>
+                                onSubmit={(val) => {
+                                    refetchLessons()
                                     updateLesson({
                                         data: {
                                             ...field,
@@ -395,13 +403,15 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
                                         },
                                         id: field._id
                                     })
-                                }
+                                }}
                                 defaultValue="Введите тему урока"
                                 value={field.topic}
                             >
-                                <EditablePreview />
-                                <Input as={EditableInput} />{' '}
-                                <EditableControls />
+                                <Flex alignItems="center">
+                                    <EditablePreview />
+                                    <Input as={EditableInput} />{' '}
+                                    <EditableControls />
+                                </Flex>
                             </Editable>
                         </Box>
                         <Box w="100%">
@@ -416,7 +426,8 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
                                         homework: val
                                     })
                                 }
-                                onSubmit={(val) =>
+                                onSubmit={(val) => {
+                                    refetchLessons()
                                     updateLesson({
                                         data: {
                                             ...field,
@@ -424,13 +435,15 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
                                         },
                                         id: field._id
                                     })
-                                }
+                                }}
                                 value={field.homework}
                                 defaultValue="Введите домашнее задание"
                             >
-                                <EditablePreview />
-                                <Input as={EditableInput} />{' '}
-                                <EditableControls />
+                                <Flex alignItems="center">
+                                    <EditablePreview />
+                                    <Input as={EditableInput} />{' '}
+                                    <EditableControls />
+                                </Flex>
                             </Editable>
                         </Box>
                     </Flex>
@@ -443,15 +456,18 @@ export default function JournalTeacher({ groupdLesson, lessons }) {
 
             <List>
                 {groupdLesson &&
-                    Object.keys(groupdLesson).map((l) => (
-                        <ListItem
-                            className="link-group"
-                            onClick={() => goTo(groupdLesson[l])}
-                            mb={3}
-                        >
-                            {l.replace('-', '  ')}
-                        </ListItem>
-                    ))}
+                    Object.keys(groupdLesson).map((l) => {
+                        return (
+                            <ListItem
+                                key={l}
+                                className="link-group"
+                                onClick={() => goTo(groupdLesson[l])}
+                                mb={3}
+                            >
+                                {l.replace('-', '  ')}
+                            </ListItem>
+                        )
+                    })}
             </List>
         </div>
     )

@@ -47,16 +47,16 @@ function getNameOfDay(i) {
 }
 
 export default function DashboardParent() {
-    const user = useSelector(state => state.user.object)
-    const {data: child, isSuccess} = useGetUsersQuery({parent: user._id})
-    const [getGroup, {data: group}] = useLazyGetGroupsQuery()
+    const user = useSelector((state) => state.user.object)
+    const { data: child, isSuccess } = useGetUsersQuery({ parent: user._id })
+    const [getGroup, { data: group }] = useLazyGetGroupsQuery()
     const [getLessons, { data: lessons, isLoading }] = useLazyGetLessonsQuery()
 
     React.useEffect(() => {
         if (child && child.length && isSuccess && group && group.length) {
-            getLessons({group: group[0]._id})
+            getLessons({ group: group[0]._id })
         } else if (child && child.length && isSuccess) {
-            getGroup({students: child[0]._id})
+            getGroup({ students: child[0]._id })
         }
     }, [user])
     const weekStart = React.useMemo(() => {
@@ -70,10 +70,12 @@ export default function DashboardParent() {
     const renderBox = useCallback(
         (d, i) => {
             const newD = new Date(d.getTime())
-            newD.setDate(newD.getDate() - 6 + i)
-            const list = lessons ? lessons.filter(
-                (l) => l.date === newD.toLocaleDateString('ru-RU')
-            ) : []
+            newD.setDate(newD.getDate() + i)
+            const list = lessons
+                ? lessons.filter(
+                      (l) => l.date === newD.toLocaleDateString('ru-RU')
+                  )
+                : []
             return (
                 <Box
                     key={i}
@@ -106,24 +108,32 @@ export default function DashboardParent() {
     )
 
     if (isLoading) {
-        return (<Center>
+        return (
+            <Center>
                 <Spinner />
-            </Center>)
+            </Center>
+        )
     }
-    if (isSuccess && child && child.length)  {
-        return  (<div>
-            <Heading textAlign='center' mb={4} fontSize='2xl'>Расписание ученика {child ? child[0].fullname : ''}</Heading>
-            <HStack spacing={4} mb={4}>
-                {weekStart && renderBox(weekStart, 0)}
-                {weekStart && renderBox(weekStart, 1)}
-                {weekStart && renderBox(weekStart, 2)}
-            </HStack>
-            <HStack spacing={4} mb={4}>
-                {weekStart && renderBox(weekStart, 3)}
-                {weekStart && renderBox(weekStart, 4)}
-                {weekStart && renderBox(weekStart, 5)}
-            </HStack>
-        </div>)
-    } 
-    return <Text>У вас не указан ребенок, свяжитесь с заместителем директора</Text>
+    if (isSuccess && child && child.length) {
+        return (
+            <div>
+                <Heading textAlign="center" mb={4} fontSize="2xl">
+                    Расписание ученика {child ? child[0].fullname : ''}
+                </Heading>
+                <HStack spacing={4} mb={4}>
+                    {weekStart && renderBox(weekStart, 0)}
+                    {weekStart && renderBox(weekStart, 1)}
+                    {weekStart && renderBox(weekStart, 2)}
+                </HStack>
+                <HStack spacing={4} mb={4}>
+                    {weekStart && renderBox(weekStart, 3)}
+                    {weekStart && renderBox(weekStart, 4)}
+                    {weekStart && renderBox(weekStart, 5)}
+                </HStack>
+            </div>
+        )
+    }
+    return (
+        <Text>У вас не указан ребенок, свяжитесь с заместителем директора</Text>
+    )
 }

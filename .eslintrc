@@ -8,7 +8,10 @@
                 "extensions": [".js", ".jsx"]
             }
         ],
-        "import/no-extraneous-dependencies": ["error",  {"devDependencies": true}],
+        "import/no-extraneous-dependencies": [
+            "error",
+            { "devDependencies": true }
+        ],
         "react/jsx-props-no-spreading": "off",
         "react/prop-types": 0,
         "no-underscore-dangle": 0,
@@ -17,9 +20,11 @@
         "import/prefer-default-export": 0,
         "no-restricted-syntax": ["warn", "WithStatement"],
         "no-param-reassign": 0,
+        "no-nested-ternary": "off",
         "consistent-return": "off",
         "arrow-body-style": "off",
         "prefer-template": "off",
+        "react/no-array-index-key": "off",
         "useSelector": "off"
     },
     "globals": {
