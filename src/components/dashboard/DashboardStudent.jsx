@@ -61,14 +61,17 @@ export default function DashboardStudent() {
         const date = new Date()
         const today = date.getDate()
         const dayOfTheWeek = date.getDay()
-        const newDate = date.setDate(today - dayOfTheWeek)
+        const newDate = date.setDate(today - dayOfTheWeek + 1)
+        console.log('New - ' + new Date(newDate).toLocaleDateString('ru-RU'))
         return new Date(newDate)
     }, [])
 
     const renderBox = useCallback(
         (d, i) => {
             const newD = new Date(d.getTime())
-            newD.setDate(newD.getDate() - 6 + i)
+            newD.setDate(newD.getDate() + i)
+            
+            console.log(newD.toLocaleDateString('ru-RU'))
             const list = lessons ? lessons.filter(
                 (l) => l.date === newD.toLocaleDateString('ru-RU')
             ) : []

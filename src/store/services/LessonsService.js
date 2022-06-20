@@ -7,13 +7,13 @@ export const lessonsAPI = createApi({
     endpoints: (build) => ({
         getLessons: build.query({
             query: (params) => ({ url: '/', params }),
-            providesTags: ['Lessons'],
-            transformResponse: (response) => response.array
+            transformResponse: (response) => response.array,
+            invalidatesTags: () => [{type: 'Lessons', id: 'LIST'}]
         }),
         getLesson: build.query({
             query: (id) => ({ url: `/${id}` }),
-            providesTags: ['Lessons'],
-            transformResponse: (response) => response.object
+            transformResponse: (response) => response.object,
+            invalidatesTags: (res, err, id) => [{type: 'Lessons', id}]
         }),
         createLesson: build.mutation({
             query: (data) => ({
@@ -21,7 +21,7 @@ export const lessonsAPI = createApi({
                 method: 'POST',
                 body: data
             }),
-            invalidatesTags: ['Lessons']
+            invalidatesTags: () => [{type: 'Lessons', id: 'LIST'}]
         }),
         updateLesson: build.mutation({
             query: ({ data, id }) => ({
@@ -29,11 +29,11 @@ export const lessonsAPI = createApi({
                 method: 'PUT',
                 body: data
             }),
-            invalidatesTags: ['Lessons']
+            invalidatesTags: (res, err, id) => [{type: 'Lessons', id}]
         }),
         deleteLesson: build.query({
             query: (id) => ({ url: `/${id}`, method: 'DELETE' }),
-            invalidatesTags: ['Lessons']
+            invalidatesTags: (res, err, id) => [{type: 'Lessons', id}]
         })
     })
 })

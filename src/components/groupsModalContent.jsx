@@ -7,7 +7,7 @@ export default function({onClose, onSubmit}) {
     return (   <ModalContent><ModalHeader>Добавить класс</ModalHeader>
     <ModalCloseButton />
     <ModalBody>
-        <Input placeholder='Введите номер класса' maxLength={4} value={name} onChange={ev => setName(ev.target.value)} />
+        <Input placeholder='Введите номер класса' maxLength={5} value={name} onChange={ev => setName(ev.target.value)} />
     </ModalBody>
 
     <ModalFooter>

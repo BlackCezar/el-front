@@ -50,9 +50,6 @@ export default function JournalStudent() {
     const [getGrades, {isLoading: isGradesLoading}] = useLazyGetGradesQuery()
     const [field, selectField] = React.useState(null)
     const isLoadingPage = React.useMemo(() => {
-        console.log(isLoading)
-        console.log(isLessonsLoading)
-        console.log(isGradesLoading)
         return isLoading && isLessonsLoading && isGradesLoading
     }, [isLoading, isLessonsLoading, isGradesLoading])
 

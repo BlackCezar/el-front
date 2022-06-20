@@ -40,7 +40,7 @@ export default function BRSModal({
                     <FormControl>
                         <FormLabel>Выберите из списка</FormLabel>
                         <Select
-                            placeholder="Выберите студента"
+                            placeholder="Выберите ученика"
                             value={object.student}
                             onChange={(ev) =>
                                 setObject({
@@ -78,6 +78,7 @@ export default function BRSModal({
                         </NumberInput>
                     </FormControl>
                     <FormControl>
+                    <FormLabel>Полугодие</FormLabel>
                     <Select
                             value={object.half}
                             placeholder="Выберите полугодие"

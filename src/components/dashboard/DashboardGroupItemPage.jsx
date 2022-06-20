@@ -28,7 +28,7 @@ export default function DashboardDeputy() {
     const [create, { isLoading }] = useCreateLessonMutation()
     const [removeLesson] = useLazyDeleteLessonQuery()
     const [update] = useUpdateLessonMutation()
-    const { data: lessons } = useGetLessonsQuery({ group: groupId })
+    const { data: lessons, refetch } = useGetLessonsQuery({ group: groupId })
     const currentDate = new Date()
     
 
@@ -57,6 +57,14 @@ export default function DashboardDeputy() {
         return d.getDate()
     }, [weekStart])
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const createLesson = async (data) => {
+        await create(data)
+        refetch()
+    }
+    const updateLesson = async (data) => {
+        await update(data)
+        refetch()
+    }
     const initialLesson = {
         date: '',
         subject: '',
@@ -97,7 +105,7 @@ export default function DashboardDeputy() {
                 <Td>{firstLesson && firstLesson.classroom}</Td>
                 {firstLesson ? <Td>
                     <IconButton onClick={() => { setSelectedLesson(firstLesson); onOpen() }} mr={3} icon={<EditIcon />} colorScheme='yellow' />
-                    <IconButton onClick={() => removeLesson(firstLesson)} icon={<DeleteIcon />} colorScheme='red' />
+                    <IconButton onClick={async () => {await removeLesson(firstLesson._id); refetch()}} icon={<DeleteIcon />} colorScheme='red' />
                 </Td> : <Td>
                     <IconButton onClick={() => {
                         addNewLesson(index, 0)
@@ -111,7 +119,7 @@ export default function DashboardDeputy() {
                 <Td>{secondLesson && secondLesson.classroom}</Td>
                 {secondLesson ? <Td>
                     <IconButton onClick={() => { setSelectedLesson(secondLesson); onOpen() }} mr={3} icon={<EditIcon />} colorScheme='yellow' />
-                    <IconButton onClick={() => removeLesson(secondLesson)} icon={<DeleteIcon />} colorScheme='red' />
+                    <IconButton onClick={async () => {await removeLesson(secondLesson._id); refetch()}} icon={<DeleteIcon />} colorScheme='red' />
                 </Td> : <Td>
                     <IconButton onClick={() => {
                         addNewLesson(index, 1)
@@ -125,7 +133,7 @@ export default function DashboardDeputy() {
                 <Td>{thirdLesson && thirdLesson.classroom}</Td>
                 {thirdLesson ? <Td>
                     <IconButton onClick={() => { setSelectedLesson(thirdLesson); onOpen() }} mr={3} icon={<EditIcon />} colorScheme='yellow' />
-                    <IconButton onClick={() => removeLesson(thirdLesson)} icon={<DeleteIcon />} colorScheme='red' />
+                    <IconButton onClick={async () => {await removeLesson(thirdLesson._id); refetch()}} icon={<DeleteIcon />} colorScheme='red' />
                 </Td> : <Td>
                     <IconButton onClick={() => {
                         addNewLesson(index, 2)
@@ -139,7 +147,7 @@ export default function DashboardDeputy() {
                 <Td>{fourLesson && fourLesson.classroom}</Td>
                 {fourLesson ? <Td>
                     <IconButton onClick={() => { setSelectedLesson(fourLesson); onOpen() }} mr={3} icon={<EditIcon />} colorScheme='yellow' />
-                    <IconButton onClick={() => removeLesson(fourLesson)} icon={<DeleteIcon />} colorScheme='red' />
+                    <IconButton onClick={async () => {await removeLesson(fourLesson._id); refetch()}} icon={<DeleteIcon />} colorScheme='red' />
                 </Td> : <Td>
                     <IconButton onClick={() => {
                         addNewLesson(index, 3)
@@ -153,7 +161,7 @@ export default function DashboardDeputy() {
                 <Td>{fiveLesson && fiveLesson.classroom}</Td>
                 {fiveLesson ? <Td>
                     <IconButton onClick={() => { setSelectedLesson(fiveLesson); onOpen() }} mr={3} icon={<EditIcon />} colorScheme='yellow' />
-                    <IconButton onClick={() => removeLesson(fiveLesson)} icon={<DeleteIcon />} colorScheme='red' />
+                    <IconButton onClick={async () => {await removeLesson(fiveLesson._id); refetch()}} icon={<DeleteIcon />} colorScheme='red' />
                 </Td> : <Td>
                     <IconButton onClick={() => {
                         addNewLesson(index, 4)
@@ -167,7 +175,7 @@ export default function DashboardDeputy() {
                 <Td>{sixLesson && sixLesson.classroom}</Td>
                 {sixLesson ? <Td>
                     <IconButton onClick={() => { setSelectedLesson(sixLesson); onOpen() }} mr={3} icon={<EditIcon />} colorScheme='yellow' />
-                    <IconButton onClick={() => removeLesson(sixLesson)} icon={<DeleteIcon />} colorScheme='red' />
+                    <IconButton onClick={async () => {await removeLesson(sixLesson._id); refetch()}} icon={<DeleteIcon />} colorScheme='red' />
                 </Td> : <Td>
                     <IconButton onClick={() => {
                         addNewLesson(index, 5)
@@ -219,7 +227,7 @@ export default function DashboardDeputy() {
                     </TableContainer>
             </Box>)}
         </VStack>}
-        <AddLesson action={selectedLesson._id ? update : create} isOpen={isOpen} onClose={onClose} setObject={setSelectedLesson} object={selectedLesson} />
+        <AddLesson action={selectedLesson._id ? updateLesson : createLesson} isOpen={isOpen} onClose={onClose} setObject={setSelectedLesson} object={selectedLesson} />
     </div>
 }
 
