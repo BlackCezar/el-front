@@ -64,6 +64,7 @@ function App() {
     }
 
     useEffect(() => {
+        console.log(data)
         if (isSuccess && data.code === 0) {
             dispatch(saveUser(data.object))
             const {role} = data.object
@@ -74,7 +75,7 @@ function App() {
             if (role === 'Parent') history("/dashboard");
             if (role === 'ClassRoomTeacher') history("/brs");
         }
-    }, [data])
+    }, [data, isSuccess, dispatch])
     return (
         <div className="login-page">
             <Center>

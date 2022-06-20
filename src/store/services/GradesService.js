@@ -31,6 +31,9 @@ export const GradesAPI = createApi({
             }),
             invalidatesTags: ['Grades']
         }),
+        getSSO: build.mutation({
+            query: (data) => ({ url: `/sso`, method: 'POST', body: data })
+        }),
         deleteGrade: build.query({
             query: (id) => ({ url: `/${id}`, method: 'DELETE' }),
             invalidatesTags: ['Grades']
@@ -44,6 +47,7 @@ export const {
     useGetGradeQuery,
     useLazyGetGradesQuery,
     useDeleteGradeQuery,
+    useGetSSOMutation,
     useLazyDeleteGradeQuery,
     useUpdateGradeMutation
 } = GradesAPI

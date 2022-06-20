@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import {  useSelector } from 'react-redux'
 import {
     Box,
     Button,
@@ -14,13 +14,10 @@ import {
 } from '@chakra-ui/react'
 import '../assets/scss/Common.scss'
 import { ReactComponent as LogoutIcon } from '../assets/images/logout.svg'
-import { useCheckConnectionQuery } from '../store/services/UserService'
-import { saveUser } from '../reducers/user'
 
 export default function Layout({ children }) {
     const navigation = useNavigate()
     const location = useLocation()
-    const dispatch = useDispatch()
     const user = useSelector((state) => state.user.object)
 
     const pageName = useMemo(() => {
@@ -49,19 +46,14 @@ export default function Layout({ children }) {
         }
         return name
     }, [location])
-    const { data, isError, isLoading } = useCheckConnectionQuery()
-    useEffect(() => {
-        if (data) {
-            dispatch(saveUser(data.object))
-        }
-    }, [data])
 
-    if (!user && isError) {
+
+    if (!user) {
         return <Navigate to="/" />
     }
     return (
         <div className="page-layout">
-            {isLoading || !user ? (
+            { !user ? (
                 <Box
                     boxShadow="xl"
                     className="sidebar"
@@ -151,7 +143,7 @@ export default function Layout({ children }) {
                     )}
                 </Box>
             )}
-            {isLoading || !user ? (
+            {!user ? (
                 <Center w="100%">
                     <Spinner size="xl" />
                 </Center>

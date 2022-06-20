@@ -12,8 +12,10 @@ import {
     Center,
     HStack
 } from '@chakra-ui/react'
-import { useGetLessonsQuery } from '../../store/services/LessonsService'
+import { useSelector } from 'react-redux'
+import {  useLazyGetLessonsQuery } from '../../store/services/LessonsService'
 import RenderLessonRow from './renderLessonRow'
+import { useLazyGetGroupsQuery } from '../../store/services/GroupsService'
 
 function getNameOfDay(i) {
     let day = ''
@@ -43,7 +45,17 @@ function getNameOfDay(i) {
 }
 
 export default function DashboardStudent() {
-    const { data: lessons, isLoading } = useGetLessonsQuery()
+    const user = useSelector(state => state.user.object)
+    const [getGroup, {data: group}] = useLazyGetGroupsQuery()
+    const [getLessons, { data: lessons, isLoading }] = useLazyGetLessonsQuery()
+
+    React.useEffect(() => {
+        if (user && group && group.length) {
+            getLessons({group: group[0]._id})
+        } else if (user) {
+            getGroup({students: user._id})
+        }
+    }, [user, group])
 
     const weekStart = React.useMemo(() => {
         const date = new Date()
@@ -57,9 +69,9 @@ export default function DashboardStudent() {
         (d, i) => {
             const newD = new Date(d.getTime())
             newD.setDate(newD.getDate() - 6 + i)
-            const list = lessons.filter(
+            const list = lessons ? lessons.filter(
                 (l) => l.date === newD.toLocaleDateString('ru-RU')
-            )
+            ) : []
             return (
                 <Box
                     key={i}

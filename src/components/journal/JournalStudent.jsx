@@ -11,6 +11,8 @@ import {
     Td,
     Text,
     Th,
+    Center,
+    Spinner,
     Thead,
     Tr
 } from '@chakra-ui/react'
@@ -31,7 +33,7 @@ export default function JournalStudent() {
     const user = useSelector((state) => state.user.object)
     const [getGroup, { data: groups, isLoading }] = useLazyGetGroupsQuery()
     const [groupedLessons, setGroupedLessons] = useState([])
-    const [getLessons, { data: lessons }] = useLazyGetLessonsQuery()
+    const [getLessons, { data: lessons, isLoading: isLessonsLoading }] = useLazyGetLessonsQuery()
     useEffect(() => {
         if (
             user &&
@@ -45,23 +47,14 @@ export default function JournalStudent() {
             getGroup({ students: user._id })
         }
     }, [user, groups, isLoading])
-    const [getGrades] = useLazyGetGradesQuery()
+    const [getGrades, {isLoading: isGradesLoading}] = useLazyGetGradesQuery()
     const [field, selectField] = React.useState(null)
-    // const getColSpan = React.useCallback(
-    //     (day, gradesL) => {
-    //         if (gradesL) {
-    //             const list = gradesL.filter((g) => g.date === day)
-    //             const students = []
-    //             list.forEach((g) => {
-    //                 if (students[g.student._id]) students[g.student._id] += 1
-    //                 else students[g.student._id] = 1
-    //             })
-    //             return Object.values(students).sort()[0] + 1
-    //         }
-    //         return 1
-    //     },
-    //     [grades]
-    // )
+    const isLoadingPage = React.useMemo(() => {
+        console.log(isLoading)
+        console.log(isLessonsLoading)
+        console.log(isGradesLoading)
+        return isLoading && isLessonsLoading && isGradesLoading
+    }, [isLoading, isLessonsLoading, isGradesLoading])
 
     const days = useMemo(() => {
         const dList = {}
@@ -92,6 +85,7 @@ export default function JournalStudent() {
             </Heading>
 
             <Box borderWidth="1px" borderColor="blue">
+            {isLoadingPage ? <Center><Center><Spinner size='lg' m={5} /></Center></Center> : 
                 <TableContainer>
                     <Table>
                         <Thead>
@@ -104,6 +98,7 @@ export default function JournalStudent() {
                                             <Th
                                                 colSpan={col[day].length}
                                                 borderWidth="1px"
+                                                key={day}
                                                 className={
                                                     field && field.date === day
                                                         ? 'journal-date active '
@@ -123,6 +118,7 @@ export default function JournalStudent() {
                                     })}
                             </Tr>
                         </Thead>
+                        
                         <Tbody>
                             {groupedLessons ? (
                                 Object.keys(groupedLessons).map((lesson) => (
@@ -139,7 +135,7 @@ export default function JournalStudent() {
                                                             lesson
                                                     )
                                                     .map((les) => (
-                                                        <Td borderWidth="1px">
+                                                        <Td borderWidth="1px" key={les._id}>
                                                             {les.number}
                                                         </Td>
                                                     ))
@@ -153,7 +149,7 @@ export default function JournalStudent() {
                             )}
                         </Tbody>
                     </Table>
-                </TableContainer>
+                </TableContainer>}
             </Box>
 
             {field && (
