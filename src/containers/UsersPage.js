@@ -34,8 +34,6 @@ export default function UsersPage() {
         login: '',
         password: '',
         rePassword: '',
-        address: '',
-        phone: '',
         fullname: '',
         role: 'Student',
         birthdate: '',
@@ -67,7 +65,6 @@ export default function UsersPage() {
                                         <Tr>
                                             <Th>Имя</Th>
                                             <Th>Логин</Th>
-                                            <Th>Телефон</Th>
                                             <Th>Роль</Th>
                                             <Th>Класс</Th>
                                             <Th>ФИО ребенка / родителя</Th>
@@ -80,7 +77,6 @@ export default function UsersPage() {
                                                 <Tr key={u._id}>
                                                     <Td>{u.fullname}</Td>
                                                     <Td>{u.login}</Td>
-                                                    <Td>{u.phone}</Td>
                                                     <Td>
                                                         {u.role === 'Admin' && (
                                                             <Badge>

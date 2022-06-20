@@ -30,20 +30,7 @@ export default function GroupItemPage() {
                 {user.fullname}
             </Heading>
             <Box m={3} p={4} ml={0} borderWidth="1px">
-                <Flex mb={4} alignItems="center">
-                    <Text w="200px" mr={4} borderRight="1px solid blue">
-                        <b>Телефон</b>
-                    </Text>
-                    <Text mr={3}>{user.phone}</Text>
-                </Flex>
-                <Divider />
-                <Flex mb={4} mt={4} alignItems="center">
-                    <Text w="200px" mr={4} borderRight="1px solid blue">
-                        <b>Адрес</b>
-                    </Text>
-                    <Text mr={3}>{user.address}</Text>
-                </Flex>
-                <Divider />
+               
                 <Flex mb={4} mt={4} alignItems="center">
                     <Text w="200px" mr={4} borderRight="1px solid blue">
                         <b>Родитель</b>
@@ -53,12 +40,7 @@ export default function GroupItemPage() {
                     </Text>
                 </Flex>
                 <Divider />
-                <Flex mt={4} alignItems="center">
-                    <Text w="200px" mr={4} borderRight="1px solid blue">
-                        <b>Телефон родителя</b>
-                    </Text>
-                    <Text mr={3}>{user.parent ? user.parent.phone : '-'}</Text>
-                </Flex>
+               
             </Box>
         </div>
     )

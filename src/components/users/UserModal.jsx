@@ -212,27 +212,6 @@ export default function UserModal({ isOpen, onClose, data, handler, user }) {
                                 </Select>
                             </FormControl>
                         )}
-                        <FormControl mb={2}>
-                            <FormLabel htmlFor="phone">
-                                Номер телефона
-                            </FormLabel>
-                            <Input
-                                id="phone"
-                                placeholder="+7 999 999 9999"
-                                value={data.phone}
-                                type="tel"
-                                onChange={(val) => handler('phone', val)}
-                            />
-                        </FormControl>
-                        <FormControl mb={2}>
-                            <FormLabel htmlFor="address">Адрес</FormLabel>
-                            <Input
-                                id="address"
-                                placeholder="ул. Ленина, д. 5, кв. 22"
-                                value={data.address}
-                                onChange={(val) => handler('address', val)}
-                            />
-                        </FormControl>
                     </form>
                 </ModalBody>
                 <ModalFooter>
